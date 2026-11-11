@@ -76,7 +76,7 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
     <div className="page" style={{ paddingBottom: 150 }}>
       <button className="btn ghost sm" style={{ marginLeft: -10, marginBottom: 6 }} onClick={nav}><Icon n="back" size={18} />{def.name}</button>
       <div className="card pad row" style={{ marginBottom: 14 }}>
-        <span className="noBadge" style={{ width: 48, height: 48, fontSize: 18, borderRadius: 12 }}>{team.no}</span>
+        <span className="noBadge" style={{ width: 48, height: 48, fontSize: 18, borderRadius: 12 }}>{String(team.no).padStart(2, '0')}</span>
         <div className="grow"><div className="disp" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1.15 }}>{team.name}</div><div className="xs muted trunc">{team.pangkalan}</div></div>
       </div>
       {existing && <p className="xs muted" style={{ marginBottom: 12 }}>Sudah dinilai{by ? ` oleh ${by}` : ''}{existing.updated_at ? ` · ${hhmm(existing.updated_at)}` : ''}</p>}

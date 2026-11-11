@@ -45,7 +45,7 @@ export default function Standings() {
           <Seg value={lk} onChange={setLk} opts={contests} />
           <div className="list">
             {ranked.map((r) => { const t = tm.get(r.teamId); if (!t) return null; return (
-              <div key={r.teamId} className="li" style={{ cursor: 'default' }}><Rank n={r.rank} tie={r.tie} /><span className="noBadge">{t.no}</span>
+              <div key={r.teamId} className="li" style={{ cursor: 'default' }}><Rank n={r.rank} tie={r.tie} /><span className="noBadge">{String(t.no).padStart(2, '0')}</span>
                 <div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{t.name}</div><div className="trunc xs muted">{t.pangkalan}</div></div>
                 {r.tie && <span className="chip gold">Seri</span>}{r.dq ? <span className="chip bad">Diskualifikasi</span> : <b className="num">{fmt(r.score)}</b>}</div>); })}
             {!ranked.length && <Empty>Belum ada nilai untuk lomba ini.</Empty>}

@@ -61,7 +61,7 @@ export function TeamList() {
             const r = recs.get(t.id); const cs = r ? contestScore(def, r) : null;
             return (
               <Link key={t.id} to={`/app/input/${key}/${t.id}`} className="li">
-                <span className="noBadge">{t.no}</span>
+                <span className="noBadge">{String(t.no).padStart(2, '0')}</span>
                 <div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{t.name}</div><div className="trunc xs muted">{t.pangkalan}</div></div>
                 {!r ? <span className="chip">Belum</span> : cs!.dq ? <span className="chip bad">Diskualifikasi</span> : (
                   <div style={{ textAlign: 'right' }}><div className="num" style={{ fontWeight: 800, fontSize: 16 }}>{fmt(cs!.score)}</div>

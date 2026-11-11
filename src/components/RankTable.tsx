@@ -28,7 +28,7 @@ export function RankTable({ lines, recap, provisional }: { lines: Line[]; recap:
           <tbody>
             {lines.map((l) => (
               <tr key={l.no}>
-                <td className="l stk"><div className="row"><Rank n={l.rank} tie={l.tie} /><span className="noBadge" style={{ minWidth: 30, height: 26, fontSize: 12 }}>{l.no}</span><b>{l.name}</b></div></td>
+                <td className="l stk"><div className="row"><Rank n={l.rank} tie={l.tie} /><span className="noBadge" style={{ minWidth: 30, height: 26, fontSize: 12 }}>{String(l.no).padStart(2, '0')}</span><b>{l.name}</b></div></td>
                 <td className="l muted">{l.pangkalan}</td>
                 {recap.map((r) => <td key={r.key} className={l.s[r.key] == null ? 'faint' : ''}>{l.s[r.key] == null ? '·' : fmt(l.s[r.key])}</td>)}
                 <td className="tot">{fmt(l.total)}</td>
@@ -43,7 +43,7 @@ export function RankTable({ lines, recap, provisional }: { lines: Line[]; recap:
           <div key={l.no} className="sc" onClick={() => setOpen(open === l.no ? null : l.no)} role="button" tabIndex={0}>
             <div className="row">
               <Rank n={l.rank} tie={l.tie} />
-              <div className="grow"><div className="trunc" style={{ fontWeight: 700 }}><span className="faint">#{l.no}</span> {l.name}</div><div className="trunc xs muted">{l.pangkalan}</div></div>
+              <div className="grow"><div className="trunc" style={{ fontWeight: 700 }}><span className="faint">#{String(l.no).padStart(2, '0')}</span> {l.name}</div><div className="trunc xs muted">{l.pangkalan}</div></div>
               <div style={{ textAlign: 'right' }}><div className="disp num" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1 }}>{fmt(l.total)}</div>{l.done < recap.length && <div className="xs faint">{l.done}/{recap.length} lomba</div>}</div>
             </div>
             {(l.award || l.out) && <div style={{ marginTop: 8 }}>{award(l)}</div>}
