@@ -75,7 +75,7 @@ export function DevFooter({ variant = 'full', style }: Props) {
           />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 11.5, fontWeight: 700, color: '#eadfca' }} className="trunc">mamCode</div>
-            <div style={{ fontSize: 10, opacity: 0.65, color: '#eadfca' }}>Developer</div>
+            <div style={{ fontSize: 10, opacity: 0.65, color: '#eadfca' }}>Developer · v 0.1.0</div>
           </div>
         </div>
         <div className="row wrap" style={{ gap: 5 }}>
@@ -176,7 +176,7 @@ export function DevFooter({ variant = 'full', style }: Props) {
       </div>
 
       <div className="xs faint" style={{ fontSize: 11 }}>
-        Dikembangkan oleh <b>mamCode</b> · Hubungi untuk layanan sistem & aplikasi
+        Dikembangkan oleh <b>mamCode</b> · v 0.1.0 · Hubungi untuk layanan sistem & aplikasi
       </div>
     </footer>
   );
