@@ -1,0 +1,2 @@
+# panji
+Panji:Penentuan
