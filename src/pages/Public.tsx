@@ -30,10 +30,10 @@ export default function Public() {
             <div className="row" style={{ gap: 8, alignItems: 'center', minWidth: 0, flex: 1 }}>
               <img src="/parisada.png" alt="Logo Parisada XXI" className="pub-logo" />
               <div style={{ minWidth: 0 }}>
-                <div style={{ letterSpacing: '.08em', fontSize: 'clamp(12.5px, 3.2vw, 16px)', fontWeight: 800, color: '#fbf1de', lineHeight: 1.15 }}>
+                <div style={{ letterSpacing: '.05em', fontSize: 'clamp(14px, 3.8vw, 17px)', fontWeight: 800, color: '#fbf1de', lineHeight: 1.15 }}>
                   PANJI PARISADA
                 </div>
-                <div style={{ fontSize: 'clamp(9px, 2.3vw, 11px)', opacity: 0.78, color: '#eadfca', marginTop: 1, lineHeight: 1.2 }}>
+                <div style={{ fontSize: 'clamp(10.5px, 2.7vw, 12px)', opacity: 0.82, color: '#eadfca', marginTop: 1, lineHeight: 1.25 }}>
                   Pusat Akumulasi Nilai, Juara & Informasi
                 </div>
               </div>
@@ -48,8 +48,8 @@ export default function Public() {
                 flex: 'none',
                 height: 32,
                 minHeight: 32,
-                padding: '0 10px',
-                fontSize: 12,
+                padding: '0 11px',
+                fontSize: 12.5,
               }}
             >
               {me ? 'Buka aplikasi' : 'Login'}
