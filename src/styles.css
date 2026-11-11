@@ -188,6 +188,11 @@ table.t{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 .cert .ev{font-size:1.5cqw;margin-top:1.8cqw;color:#5b5144;max-width:70cqw;line-height:1.5}
 .cert .sg{margin-top:auto;display:flex;justify-content:space-between;width:100%;padding:0 6cqw;font-size:1.4cqw}
 .cert .sg b{display:block;margin-top:5cqw;border-top:.12cqw solid #33261a;padding-top:.5cqw;min-width:22cqw}
+/* version badge */
+.ver-badge{position:fixed;right:12px;bottom:calc(10px + var(--safe-b));z-index:45;font-size:11px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:.02em;padding:3px 9px;border-radius:99px;background:rgba(32,26,19,.78);color:#f7eedf;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(247,238,223,.18);box-shadow:0 2px 8px rgba(0,0,0,.22);pointer-events:none;user-select:none;line-height:1.2}
+.ver-badge.in-app{bottom:calc(58px + var(--safe-b))}
+@media(min-width:900px){.ver-badge,.ver-badge.in-app{bottom:12px;right:14px;font-size:11.5px}}
+
 .print-only{display:none}
 @media(prefers-reduced-motion:reduce){
   *,::before,::after{
@@ -200,7 +205,7 @@ table.t{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 @media print{
   @page{size:A4 landscape;margin:0}
   html,body{background:#fff!important}
-  .no-print,.side,.topbar,.tabbar,.stripe,.toasts,.netbar,.foot{display:none!important}
+  .no-print,.side,.topbar,.tabbar,.stripe,.toasts,.netbar,.foot,.ver-badge{display:none!important}
   .page{padding:0!important;max-width:none!important} .main{display:block}
   .cert-wrap{width:297mm;height:210mm;max-width:none;margin:0;page-break-after:always;break-after:page}
   .cert{box-shadow:none}

@@ -3,6 +3,7 @@ import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from 'react-rou
 import { Icon, Mark } from './components/ui';
 import { DevFooter } from './components/DevFooter';
 import { InstallPrompt } from './components/InstallPrompt';
+import { VersionBadge } from './components/VersionBadge';
 import { useApp } from './lib/store';
 import Login from './pages/Login';
 import Public from './pages/Public';
@@ -76,24 +77,27 @@ const L = ({ children }: { children: JSX.Element }) => <Suspense fallback={<div 
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Public />} />
-      <Route path="/masuk" element={<Login />} />
-      <Route path="/app/cetak" element={<AdminOnly><L><Print /></L></AdminOnly>} />
-      <Route path="/app" element={<Shell />}>
-        <Route index element={<Dashboard />} />
-        <Route path="input" element={<ContestList />} />
-        <Route path="input/:key" element={<TeamList />} />
-        <Route path="input/:key/:teamId" element={<ScoreForm />} />
-        <Route path="klasemen" element={<Standings />} />
-        <Route path="juara" element={<AdminOnly><Awards /></AdminOnly>} />
-        <Route path="regu" element={<AdminOnly><L><Teams /></L></AdminOnly>} />
-        <Route path="akun" element={<AdminOnly><L><Users /></L></AdminOnly>} />
-        <Route path="riwayat" element={<AdminOnly><L><Audit /></L></AdminOnly>} />
-        <Route path="pengaturan" element={<AdminOnly><L><Settings /></L></AdminOnly>} />
-        <Route path="menu" element={<Menu />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Public />} />
+        <Route path="/masuk" element={<Login />} />
+        <Route path="/app/cetak" element={<AdminOnly><L><Print /></L></AdminOnly>} />
+        <Route path="/app" element={<Shell />}>
+          <Route index element={<Dashboard />} />
+          <Route path="input" element={<ContestList />} />
+          <Route path="input/:key" element={<TeamList />} />
+          <Route path="input/:key/:teamId" element={<ScoreForm />} />
+          <Route path="klasemen" element={<Standings />} />
+          <Route path="juara" element={<AdminOnly><Awards /></AdminOnly>} />
+          <Route path="regu" element={<AdminOnly><L><Teams /></L></AdminOnly>} />
+          <Route path="akun" element={<AdminOnly><L><Users /></L></AdminOnly>} />
+          <Route path="riwayat" element={<AdminOnly><L><Audit /></L></AdminOnly>} />
+          <Route path="pengaturan" element={<AdminOnly><L><Settings /></L></AdminOnly>} />
+          <Route path="menu" element={<Menu />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <VersionBadge />
+    </>
   );
 }
