@@ -26,9 +26,19 @@ export default function Public() {
     <>
       <header className="hero">
         <div className="in">
-          <div className="row between">
-            <div className="row"><Mark size={38} /><b style={{ letterSpacing: '.14em', fontSize: 13 }}>PANJI</b></div>
-            <Link to={me ? '/app' : '/masuk'} className="btn sm" style={{ background: 'transparent', color: '#f3e9d6', borderColor: 'rgba(255,255,255,.3)' }}>{me ? 'Buka aplikasi' : 'Masuk panitia'}</Link>
+          <div className="row between wrap" style={{ gap: 12 }}>
+            <div className="row" style={{ gap: 12, alignItems: 'center' }}>
+              <img src="/parisada.png" alt="Logo Parisada XXI" className="pub-logo" />
+              <div>
+                <div style={{ letterSpacing: '.12em', fontSize: 16, fontWeight: 800, color: '#fbf1de', lineHeight: 1.15 }}>
+                  PANJI PARISADA
+                </div>
+                <div className="xs" style={{ opacity: 0.8, color: '#eadfca', marginTop: 2 }}>
+                  Pusat Akumulasi Nilai, Juara & Informasi
+                </div>
+              </div>
+            </div>
+            <Link to={me ? '/app' : '/masuk'} className="btn sm" style={{ background: 'transparent', color: '#f3e9d6', borderColor: 'rgba(255,255,255,.3)' }}>{me ? 'Buka aplikasi' : 'Login'}</Link>
           </div>
           <div className="eyebrow" style={{ color: '#d9952b', marginTop: 26 }}>Klasemen resmi</div>
           <h1>{ev?.short ?? 'PARISADA XXI'}</h1>
