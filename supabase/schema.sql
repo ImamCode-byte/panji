@@ -95,7 +95,9 @@ alter table public.snapshot enable row level security;
 alter table public.score_log enable row level security;
 
 drop policy if exists p_profiles_read on public.profiles;
+drop policy if exists p_profiles_write on public.profiles;
 create policy p_profiles_read on public.profiles for select to authenticated using (id = auth.uid() or public.is_admin());
+create policy p_profiles_write on public.profiles for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 drop policy if exists p_teams_read on public.teams;
 drop policy if exists p_teams_write on public.teams;
@@ -129,4 +131,5 @@ do $$ begin
   begin alter publication supabase_realtime add table public.scores; exception when others then null; end;
   begin alter publication supabase_realtime add table public.teams; exception when others then null; end;
   begin alter publication supabase_realtime add table public.settings; exception when others then null; end;
+  begin alter publication supabase_realtime add table public.profiles; exception when others then null; end;
 end $$;

@@ -51,8 +51,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const reload = useCallback(async () => {
     const m = meRef.current; if (!m) return;
     try {
-      const d = await api.load(m.role === 'admin');
+      const [d, myProf] = await Promise.all([
+        api.load(m.role === 'admin'),
+        api.profile(m.id),
+      ]);
       setData({ ...d, scores: overlay(d.scores) });
+      if (myProf) setMe(myProf);
     } catch (e) { if (!(e instanceof NetErr)) console.error(e); }
   }, []);
 

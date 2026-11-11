@@ -14,16 +14,50 @@ export default function Users() {
   const edit = (p: Profile) => setD({ id: p.id, username: p.username, name: p.name, password: '', role: p.role, contests: p.contests });
   const toggle = (k: string) => d && setD({ ...d, contests: d.contests.includes(k) ? d.contests.filter((x) => x !== k) : [...d.contests, k] });
   const save = async () => {
-    if (!d) return; setBusy(true);
+    if (!d) return;
+    if (d.password && d.password.trim().length > 0 && d.password.trim().length < 6) {
+      return toast('Kata sandi minimal 6 karakter', 'err');
+    }
+    setBusy(true);
     try {
-      if (d.id) await act(() => api.users('PATCH', { id: d.id, name: d.name, contests: d.contests, role: d.role, password: d.password || undefined }));
-      else { await act(() => api.users('POST', { username: d.username, name: d.name, password: d.password, role: d.role, contests: d.contests })); setMade({ u: d.username.toLowerCase(), p: d.password }); }
-      toast('Akun tersimpan'); setD(null);
-    } catch (e) { toast((e as Error).message, 'err'); } finally { setBusy(false); }
+      if (d.id) {
+        await act(() => api.users('PATCH', {
+          id: d.id,
+          name: d.name.trim(),
+          contests: d.contests,
+          role: d.role,
+          password: d.password.trim() || undefined,
+        }));
+      } else {
+        await act(() => api.users('POST', {
+          username: d.username.trim(),
+          name: d.name.trim(),
+          password: d.password.trim(),
+          role: d.role,
+          contests: d.contests,
+        }));
+        setMade({ u: d.username.toLowerCase(), p: d.password.trim() });
+      }
+      toast('Akun tersimpan');
+      setD(null);
+    } catch (e) {
+      toast((e as Error).message, 'err');
+    } finally {
+      setBusy(false);
+    }
   };
   const remove = async () => {
-    if (!d?.id || !confirm(`Hapus akun ${d.username}?`)) return;
-    try { await act(() => api.users('DELETE', { id: d.id })); toast('Akun dihapus'); setD(null); } catch (e) { toast((e as Error).message, 'err'); }
+    if (!d?.id || !confirm(`Hapus akun "${d.name || d.username}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+    setBusy(true);
+    try {
+      await act(() => api.users('DELETE', { id: d.id }));
+      toast('Akun berhasil dihapus');
+      setD(null);
+    } catch (e) {
+      toast((e as Error).message, 'err');
+    } finally {
+      setBusy(false);
+    }
   };
   return (
     <div className="page">
@@ -58,8 +92,16 @@ export default function Users() {
               <button type="button" className={`chip ${!d.contests.length ? 'ok' : ''}`} style={{ height: 32, border: 0, cursor: 'pointer' }} onClick={() => setD({ ...d, contests: [] })}>Semua lomba</button>
               {cfg.contests.map((c) => <button type="button" key={c.key} className={`chip ${d.contests.includes(c.key) ? 'ok' : ''}`} style={{ height: 32, border: 0, cursor: 'pointer' }} onClick={() => toggle(c.key)}>{c.name}</button>)}
             </div></div>}
-          <div className="row" style={{ marginTop: 6 }}>{d.id && d.id !== me?.id && <button className="btn danger" onClick={remove}><Icon n="trash" size={17} /></button>}
-            <button className="btn primary grow" disabled={busy || !d.name.trim() || (!d.id && (!d.username || d.password.length < 6))} onClick={save}>{busy ? 'Menyimpan…' : 'Simpan'}</button></div>
+          <div className="row between" style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--line)', gap: 8 }}>
+            {d.id && d.id !== me?.id ? (
+              <button type="button" className="btn danger sm" onClick={remove} disabled={busy}>
+                <Icon n="trash" size={16} /> Hapus Akun
+              </button>
+            ) : <span />}
+            <button className="btn primary" disabled={busy || !d.name.trim() || (!d.id && (!d.username || d.password.length < 6))} onClick={save}>
+              {busy ? 'Menyimpan…' : d.id ? 'Simpan Perubahan' : 'Buat Akun'}
+            </button>
+          </div>
         </div>
       </Sheet>}
     </div>

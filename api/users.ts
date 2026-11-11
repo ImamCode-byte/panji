@@ -5,8 +5,41 @@ const DOMAIN = 'panji.local';
 const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
+async function parseBody(req: VercelRequest): Promise<Record<string, unknown>> {
+  if (req.body) {
+    if (typeof req.body === 'string') {
+      try { return JSON.parse(req.body); } catch { return {}; }
+    }
+    if (Buffer.isBuffer(req.body)) {
+      try { return JSON.parse(req.body.toString('utf8')); } catch { return {}; }
+    }
+    if (typeof req.body === 'object') {
+      return req.body as Record<string, unknown>;
+    }
+  }
+  return new Promise((resolve) => {
+    let data = '';
+    req.on('data', (c) => { data += c; });
+    req.on('end', () => {
+      try { resolve(data ? JSON.parse(data) : {}); } catch { resolve({}); }
+    });
+    req.on('error', () => resolve({}));
+  });
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!url || !key) return res.status(500).json({ error: 'Server belum dikonfigurasi (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY).' });
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (!url || !key) {
+    return res.status(500).json({ error: 'Server belum dikonfigurasi (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY).' });
+  }
+
   const sb = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 
   const token = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '');
@@ -15,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { data: me } = await sb.from('profiles').select('role').eq('id', au.user.id).maybeSingle();
   if (me?.role !== 'admin') return res.status(403).json({ error: 'Khusus admin.' });
 
-  const body = (typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body) ?? {};
+  const body = await parseBody(req);
   const fail = (code: number, error: string) => res.status(code).json({ error });
 
   try {
@@ -24,7 +57,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (error) return fail(500, error.message);
       return res.json({ users: data });
     }
-    if (req.method === 'POST') {
+
+    if (req.method === 'POST' && !body.id) {
       const username = String(body.username ?? '').trim().toLowerCase();
       const password = String(body.password ?? '');
       if (!/^[a-z0-9._-]{3,24}$/.test(username)) return fail(400, 'Username 3–24 karakter: huruf kecil, angka, titik, strip.');
@@ -42,35 +76,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (e2) return fail(500, e2.message);
       return res.json({ ok: true, id: data.user.id });
     }
-    if (req.method === 'PATCH') {
+
+    if (req.method === 'PATCH' || (req.method === 'POST' && body.id)) {
       const id = String(body.id ?? '');
       if (!id) return fail(400, 'id wajib.');
+
       if (body.password) {
-        if (String(body.password).length < 6) return fail(400, 'Kata sandi minimal 6 karakter.');
-        const { error } = await sb.auth.admin.updateUserById(id, { password: String(body.password) });
+        const pwd = String(body.password).trim();
+        if (pwd.length < 6) return fail(400, 'Kata sandi minimal 6 karakter.');
+        const { error } = await sb.auth.admin.updateUserById(id, { password: pwd });
         if (error) return fail(400, error.message);
       }
+
       const patch: Record<string, unknown> = {};
-      if (typeof body.name === 'string') patch.name = body.name;
+      if (typeof body.name === 'string') patch.name = body.name.trim();
       if (Array.isArray(body.contests)) patch.contests = body.contests;
       if (body.role === 'admin' || body.role === 'juri') {
         if (id === au.user.id && body.role !== 'admin') return fail(400, 'Tidak bisa menurunkan peran akun sendiri.');
         patch.role = body.role;
       }
-      if (Object.keys(patch).length) {
+
+      if (Object.keys(patch).length > 0) {
         const { error } = await sb.from('profiles').update(patch).eq('id', id);
         if (error) return fail(500, error.message);
       }
       return res.json({ ok: true });
     }
+
     if (req.method === 'DELETE') {
       const id = String(req.query.id ?? body.id ?? '');
       if (!id) return fail(400, 'id wajib.');
       if (id === au.user.id) return fail(400, 'Tidak bisa menghapus akun sendiri.');
+
+      // Lepas keterkaitan di tabel scores & profiles agar tidak terkena constraint error
+      await sb.from('scores').update({ updated_by: null }).eq('updated_by', id);
+      await sb.from('profiles').delete().eq('id', id);
+
       const { error } = await sb.auth.admin.deleteUser(id);
       if (error) return fail(400, error.message);
       return res.json({ ok: true });
     }
+
     return fail(405, 'Metode tidak didukung.');
   } catch (e) {
     return fail(500, e instanceof Error ? e.message : 'Kesalahan server.');

@@ -175,7 +175,8 @@ export const api = {
     if (DEMO) return () => {};
     const ch = sb!.channel('live').on('postgres_changes', { event: '*', schema: 'public', table: 'scores' }, cb)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'teams' }, cb)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, cb).subscribe();
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, cb)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, cb).subscribe();
     return () => { sb!.removeChannel(ch); };
   },
 };
