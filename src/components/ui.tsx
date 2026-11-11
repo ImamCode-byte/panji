@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 const P: Record<string, string> = {
   home: 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z',
@@ -62,7 +63,7 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
     document.addEventListener('keydown', k); document.body.style.overflow = 'hidden';
     return () => { document.removeEventListener('keydown', k); document.body.style.overflow = ''; };
   }, [onClose]);
-  return (
+  return createPortal(
     <div className="sbg" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="sheet" role="dialog" aria-label={title}>
         <div className="row between" style={{ marginBottom: 14 }}>
@@ -71,7 +72,8 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
