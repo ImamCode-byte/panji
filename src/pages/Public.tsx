@@ -26,19 +26,34 @@ export default function Public() {
     <>
       <header className="hero">
         <div className="in">
-          <div className="row between wrap" style={{ gap: 12 }}>
-            <div className="row" style={{ gap: 12, alignItems: 'center' }}>
+          <div className="row between" style={{ gap: 8, alignItems: 'center' }}>
+            <div className="row" style={{ gap: 8, alignItems: 'center', minWidth: 0, flex: 1 }}>
               <img src="/parisada.png" alt="Logo Parisada XXI" className="pub-logo" />
-              <div>
-                <div style={{ letterSpacing: '.12em', fontSize: 16, fontWeight: 800, color: '#fbf1de', lineHeight: 1.15 }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ letterSpacing: '.08em', fontSize: 'clamp(12.5px, 3.2vw, 16px)', fontWeight: 800, color: '#fbf1de', lineHeight: 1.15 }}>
                   PANJI PARISADA
                 </div>
-                <div className="xs" style={{ opacity: 0.8, color: '#eadfca', marginTop: 2 }}>
+                <div style={{ fontSize: 'clamp(9px, 2.3vw, 11px)', opacity: 0.78, color: '#eadfca', marginTop: 1, lineHeight: 1.2 }}>
                   Pusat Akumulasi Nilai, Juara & Informasi
                 </div>
               </div>
             </div>
-            <Link to={me ? '/app' : '/masuk'} className="btn sm" style={{ background: 'transparent', color: '#f3e9d6', borderColor: 'rgba(255,255,255,.3)' }}>{me ? 'Buka aplikasi' : 'Login'}</Link>
+            <Link
+              to={me ? '/app' : '/masuk'}
+              className="btn sm"
+              style={{
+                background: 'transparent',
+                color: '#f3e9d6',
+                borderColor: 'rgba(255,255,255,.3)',
+                flex: 'none',
+                height: 32,
+                minHeight: 32,
+                padding: '0 10px',
+                fontSize: 12,
+              }}
+            >
+              {me ? 'Buka aplikasi' : 'Login'}
+            </Link>
           </div>
           <div className="eyebrow" style={{ color: '#d9952b', marginTop: 26 }}>Klasemen resmi</div>
           <h1>{ev?.short ?? 'PARISADA XXI'}</h1>
