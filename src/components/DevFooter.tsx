@@ -74,7 +74,7 @@ export function DevFooter({ variant = 'full', style }: Props) {
             style={{ borderRadius: 6, objectFit: 'contain', background: '#fff', padding: 1 }}
           />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: '#eadfca' }} className="trunc">ImamCode</div>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: '#eadfca' }} className="trunc">mamCode</div>
             <div style={{ fontSize: 10, opacity: 0.65, color: '#eadfca' }}>Developer</div>
           </div>
         </div>
@@ -127,7 +127,7 @@ export function DevFooter({ variant = 'full', style }: Props) {
       <div className="row" style={{ gap: 10, alignItems: 'center' }}>
         <img
           src="/mamCode.png"
-          alt="Logo Developer ImamCode"
+          alt="Logo Developer mamCode"
           width={42}
           height={42}
           style={{
@@ -141,7 +141,7 @@ export function DevFooter({ variant = 'full', style }: Props) {
         />
         <div style={{ textAlign: 'left' }}>
           <div style={{ fontWeight: 800, fontSize: 14.5, letterSpacing: '.01em' }}>
-            ImamCode
+            mamCode
           </div>
           <div className="xs muted">Pengembang Aplikasi Penilaian PANJI</div>
         </div>
@@ -165,7 +165,7 @@ export function DevFooter({ variant = 'full', style }: Props) {
               borderColor: 'var(--line)',
               color: 'var(--ink)',
             }}
-            title={`${item.name} · ImamCode`}
+            title={`${item.name} · mamCode`}
           >
             <span style={{ display: 'grid', placeItems: 'center', color: item.color === '#ffffff' ? 'inherit' : item.color }}>
               {item.icon}
@@ -176,8 +176,9 @@ export function DevFooter({ variant = 'full', style }: Props) {
       </div>
 
       <div className="xs faint" style={{ fontSize: 11 }}>
-        Dikembangkan oleh <b>ImamCode</b> · Hubungi untuk layanan sistem & aplikasi
+        Dikembangkan oleh <b>mamCode</b> · Hubungi untuk layanan sistem & aplikasi
       </div>
     </footer>
   );
 }
+
