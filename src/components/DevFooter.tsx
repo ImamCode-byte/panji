@@ -67,7 +67,7 @@ export function DevFooter({ variant = 'full', style }: Props) {
       <div style={{ marginTop: 'auto', paddingTop: 14, borderTop: '1px solid rgba(255,255,255,.12)', ...style }}>
         <div className="row" style={{ gap: 8, alignItems: 'center', marginBottom: 8 }}>
           <img
-            src="/mamCode.png"
+            src="/mamCode.png?v=2"
             alt="mamCode Logo"
             width={28}
             height={28}
@@ -126,7 +126,7 @@ export function DevFooter({ variant = 'full', style }: Props) {
     >
       <div className="row" style={{ gap: 10, alignItems: 'center' }}>
         <img
-          src="/mamCode.png"
+          src="/mamCode.png?v=2"
           alt="Logo Developer mamCode"
           width={42}
           height={42}
