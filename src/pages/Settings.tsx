@@ -219,6 +219,22 @@ export default function Settings() {
 
             <div className="row between">
               <div>
+                <b>Sembunyikan teks pengantar & judul bawaan</b>
+                <div className="xs muted">Hapus "PARISADA XXI", "Sertifikat Kejuaraan", "Diberikan kepada", "yang telah meraih", dan tanggal perkemahan karena sudah tercetak di gambar desain Anda.</div>
+              </div>
+              <Switch
+                on={d.certificate?.hideBoilerplate ?? true}
+                onChange={(v) => {
+                  const c = structuredClone(d.certificate ?? {});
+                  c.hideBoilerplate = v;
+                  setD({ ...d, certificate: c });
+                }}
+                label="Sembunyikan teks pengantar"
+              />
+            </div>
+
+            <div className="row between">
+              <div>
                 <b>Sembunyikan garis bingkai bawaan</b>
                 <div className="xs muted">Sembunyikan garis ganda bawaan agar tidak menabrak bingkai pada desain Anda.</div>
               </div>
@@ -246,6 +262,153 @@ export default function Settings() {
                   setD({ ...d, certificate: c });
                 }}
                 label="Sembunyikan garis tanda tangan"
+              />
+            </div>
+
+            <div className="hr" />
+            <div className="eyebrow">Posisi Teks (Nama, Pangkalan, Gelar Juara)</div>
+
+            <div className="stack sm">
+              <div className="row between">
+                <div>
+                  <b>Geser Kiri ↔ Kanan (Horizontal)</b>
+                  <div className="xs muted">Atur posisi horizontal teks agar tepat berada pada kolom desain sertifikat Anda.</div>
+                </div>
+                <div className="num" style={{ fontWeight: 700, minWidth: 60, textAlign: 'right' }}>
+                  {(d.certificate?.textOffsetX ?? 0) > 0 ? `+${d.certificate?.textOffsetX} %` : `${d.certificate?.textOffsetX ?? 0} %`}
+                </div>
+              </div>
+              <div className="row" style={{ gap: 10, alignItems: 'center' }}>
+                <button
+                  type="button"
+                  className="btn sm"
+                  onClick={() => {
+                    const c = structuredClone(d.certificate ?? {});
+                    c.textOffsetX = (c.textOffsetX ?? 0) - 2;
+                    setD({ ...d, certificate: c });
+                  }}
+                  title="Geser ke kiri 2%"
+                >
+                  ◀ Kiri
+                </button>
+                <input
+                  type="range"
+                  min="-30"
+                  max="30"
+                  step="1"
+                  value={d.certificate?.textOffsetX ?? 0}
+                  onChange={(e) => {
+                    const c = structuredClone(d.certificate ?? {});
+                    c.textOffsetX = parseInt(e.target.value, 10);
+                    setD({ ...d, certificate: c });
+                  }}
+                  style={{ flex: 1, accentColor: 'var(--accent)' }}
+                />
+                <button
+                  type="button"
+                  className="btn sm"
+                  onClick={() => {
+                    const c = structuredClone(d.certificate ?? {});
+                    c.textOffsetX = (c.textOffsetX ?? 0) + 2;
+                    setD({ ...d, certificate: c });
+                  }}
+                  title="Geser ke kanan 2%"
+                >
+                  Kanan ▶
+                </button>
+                <button
+                  type="button"
+                  className="btn ghost sm"
+                  onClick={() => {
+                    const c = structuredClone(d.certificate ?? {});
+                    c.textOffsetX = 0;
+                    setD({ ...d, certificate: c });
+                  }}
+                >
+                  Pusat (0)
+                </button>
+              </div>
+            </div>
+
+            <div className="stack sm">
+              <div className="row between">
+                <div>
+                  <b>Geser Atas ↕ Bawah (Vertikal)</b>
+                  <div className="xs muted">Naikkan atau turunkan posisi teks agar pas di garis tanda tangan/isian desain.</div>
+                </div>
+                <div className="num" style={{ fontWeight: 700, minWidth: 60, textAlign: 'right' }}>
+                  {(d.certificate?.textOffsetY ?? 0) > 0 ? `+${d.certificate?.textOffsetY} %` : `${d.certificate?.textOffsetY ?? 0} %`}
+                </div>
+              </div>
+              <div className="row" style={{ gap: 10, alignItems: 'center' }}>
+                <button
+                  type="button"
+                  className="btn sm"
+                  onClick={() => {
+                    const c = structuredClone(d.certificate ?? {});
+                    c.textOffsetY = (c.textOffsetY ?? 0) - 2;
+                    setD({ ...d, certificate: c });
+                  }}
+                  title="Naikkan 2%"
+                >
+                  ▲ Naik
+                </button>
+                <input
+                  type="range"
+                  min="-35"
+                  max="35"
+                  step="1"
+                  value={d.certificate?.textOffsetY ?? 0}
+                  onChange={(e) => {
+                    const c = structuredClone(d.certificate ?? {});
+                    c.textOffsetY = parseInt(e.target.value, 10);
+                    setD({ ...d, certificate: c });
+                  }}
+                  style={{ flex: 1, accentColor: 'var(--accent)' }}
+                />
+                <button
+                  type="button"
+                  className="btn sm"
+                  onClick={() => {
+                    const c = structuredClone(d.certificate ?? {});
+                    c.textOffsetY = (c.textOffsetY ?? 0) + 2;
+                    setD({ ...d, certificate: c });
+                  }}
+                  title="Turunkan 2%"
+                >
+                  Turun ▼
+                </button>
+                <button
+                  type="button"
+                  className="btn ghost sm"
+                  onClick={() => {
+                    const c = structuredClone(d.certificate ?? {});
+                    c.textOffsetY = 0;
+                    setD({ ...d, certificate: c });
+                  }}
+                >
+                  Pusat (0)
+                </button>
+              </div>
+            </div>
+
+            <div className="row between">
+              <div>
+                <b>Perataan Teks</b>
+                <div className="xs muted">Pilihan perataan horizontal teks nama dan predikat juara.</div>
+              </div>
+              <Seg
+                value={d.certificate?.textAlign ?? 'center'}
+                onChange={(v) => {
+                  const c = structuredClone(d.certificate ?? {});
+                  c.textAlign = v as 'center' | 'left' | 'right';
+                  setD({ ...d, certificate: c });
+                }}
+                opts={[
+                  { v: 'left', l: 'Kiri' },
+                  { v: 'center', l: 'Tengah' },
+                  { v: 'right', l: 'Kanan' },
+                ]}
               />
             </div>
           </div>
@@ -278,8 +441,8 @@ export default function Settings() {
               <Cert
                 c={
                   previewKind === 'win'
-                    ? { kind: 'Sertifikat Kejuaraan', label: 'Juara I Lomba LKBB', name: 'Regu Rajawali (Putra)', pangkalan: 'SMP Negeri 1 Pamekasan', teamId: 'sample-preview' }
-                    : { kind: 'Sertifikat Kegiatan', label: 'Peserta Perkemahan', name: 'Regu Melati (Putri)', pangkalan: 'MTsN 2 Pamekasan', teamId: 'sample-preview' }
+                    ? { kind: 'Sertifikat Kejuaraan', label: 'Juara Umum', name: 'Regu Garuda', pangkalan: 'Darul Ulum Banyuanyar', teamId: 'sample-preview' }
+                    : { kind: 'Sertifikat Kegiatan', label: 'Peserta Perkemahan', name: 'Regu Garuda', pangkalan: 'Darul Ulum Banyuanyar', teamId: 'sample-preview' }
                 }
                 ev={d.event}
                 certCfg={d.certificate}

@@ -194,6 +194,10 @@ export const DEFAULT_CONFIG: Config = {
     bgParticipant: '',
     hideBorders: false,
     hideSignatures: false,
+    hideBoilerplate: true,
+    textOffsetX: 0,
+    textOffsetY: 0,
+    textAlign: 'center',
   },
 };
 
@@ -222,6 +226,10 @@ export function mergeConfig(saved: Partial<Config> | null | undefined): Config {
       bgParticipant: saved.certificate?.bgParticipant ?? '',
       hideBorders: saved.certificate?.hideBorders ?? false,
       hideSignatures: saved.certificate?.hideSignatures ?? false,
+      hideBoilerplate: saved.certificate?.hideBoilerplate ?? true,
+      textOffsetX: saved.certificate?.textOffsetX ?? 0,
+      textOffsetY: saved.certificate?.textOffsetY ?? 0,
+      textAlign: saved.certificate?.textAlign ?? 'center',
     },
   };
 }

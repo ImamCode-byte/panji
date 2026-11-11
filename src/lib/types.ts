@@ -23,6 +23,10 @@ export interface CertConfig {
   bgParticipant?: string;
   hideBorders?: boolean;
   hideSignatures?: boolean;
+  hideBoilerplate?: boolean;
+  textOffsetX?: number;
+  textOffsetY?: number;
+  textAlign?: 'center' | 'left' | 'right';
 }
 export interface Config {
   event: { name: string; short: string; tema: string; lokasi: string; tanggal: string; ketua: string; mabigus: string };
