@@ -60,7 +60,6 @@ export default function Settings() {
     const t = sp.get('tab');
     return t === 's' || t === 'e' || t === 'l' || t === 'm' || t === 'j' || t === 'd' ? t : 'e';
   });
-  const [previewKind, setPreviewKind] = useState<'win' | 'peserta'>('win');
   const [open, setOpen] = useState<string | null>(null); const [busy, setBusy] = useState(false);
   const dirty = JSON.stringify(d) !== JSON.stringify(cfg);
   const save = async () => {
@@ -93,19 +92,18 @@ export default function Settings() {
             <div>
               <div style={{ fontWeight: 700, fontSize: 16 }}>Desain Latar Belakang Sertifikat</div>
               <p className="sm muted" style={{ marginTop: 4 }}>
-                Unggah berkas gambar (PNG / JPG / WebP) rasio A4 lanskap (297 × 210 mm) dari Canva, Corel, atau Photoshop.
-                Gambar akan menjadi latar belakang cetak, dan nama regu, nomor, pangkalan, serta gelar juara dicetak otomatis di atasnya.
+                Unggah berkas gambar (PNG / JPG / WebP) rasio A4 lanskap (297 × 210 mm).
               </p>
             </div>
 
             <div className="hr" />
 
-            {/* Template Juara */}
+            {/* Template Sertifikat */}
             <div className="stack sm">
               <div className="row between wrap">
                 <div>
-                  <b>Latar Sertifikat Kejuaraan / Juara</b>
-                  <div className="xs muted">Untuk semua sertifikat pemenang (Juara Umum, Kategori, Per Lomba, Favorit).</div>
+                  <b>Berkas Desain Sertifikat</b>
+                  <div className="xs muted">Gambar latar belakang untuk semua sertifikat.</div>
                 </div>
                 {d.certificate?.bgWinner && (
                   <button
@@ -114,6 +112,7 @@ export default function Settings() {
                     onClick={() => {
                       const c = structuredClone(d.certificate ?? {});
                       delete c.bgWinner;
+                      delete c.bgParticipant;
                       setD({ ...d, certificate: c });
                     }}
                   >
@@ -124,16 +123,16 @@ export default function Settings() {
 
               {d.certificate?.bgWinner ? (
                 <div style={{ position: 'relative', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--line)', maxHeight: 180, textAlign: 'center', background: '#f5f5f5' }}>
-                  <img src={d.certificate.bgWinner} alt="Desain Juara" style={{ maxHeight: 180, width: 'auto', objectFit: 'contain' }} />
+                  <img src={d.certificate.bgWinner} alt="Desain Sertifikat" style={{ maxHeight: 180, width: 'auto', objectFit: 'contain' }} />
                 </div>
               ) : (
                 <div className="empty sm" style={{ border: '2px dashed var(--line)', borderRadius: 10, padding: '16px' }}>
-                  <span className="xs muted">Belum ada desain kustom (menggunakan garis & warna bawaan sistem)</span>
+                  <span className="xs muted">Belum ada desain sertifikat yang diunggah</span>
                 </div>
               )}
 
               <label className="btn block" style={{ textAlign: 'center', cursor: 'pointer' }}>
-                <Icon n="down" size={17} /> {d.certificate?.bgWinner ? 'Ganti berkas desain juara…' : 'Unggah desain sertifikat juara…'}
+                <Icon n="down" size={17} /> {d.certificate?.bgWinner ? 'Ganti berkas desain sertifikat…' : 'Unggah desain sertifikat…'}
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
@@ -145,66 +144,9 @@ export default function Settings() {
                       const b64 = await processImage(file);
                       const c = structuredClone(d.certificate ?? {});
                       c.bgWinner = b64;
-                      setD({ ...d, certificate: c });
-                      toast('Desain juara berhasil dimuat');
-                    } catch (err) {
-                      toast((err as Error).message, 'err');
-                    }
-                    e.target.value = '';
-                  }}
-                />
-              </label>
-            </div>
-
-            <div className="hr" />
-
-            {/* Template Peserta */}
-            <div className="stack sm">
-              <div className="row between wrap">
-                <div>
-                  <b>Latar Sertifikat Peserta / Partisipasi</b>
-                  <div className="xs muted">Opsional. Jika kosong, akan otomatis mengikuti desain juara atau template bawaan.</div>
-                </div>
-                {d.certificate?.bgParticipant && (
-                  <button
-                    type="button"
-                    className="btn danger sm"
-                    onClick={() => {
-                      const c = structuredClone(d.certificate ?? {});
-                      delete c.bgParticipant;
-                      setD({ ...d, certificate: c });
-                    }}
-                  >
-                    <Icon n="trash" size={16} /> Hapus
-                  </button>
-                )}
-              </div>
-
-              {d.certificate?.bgParticipant ? (
-                <div style={{ position: 'relative', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--line)', maxHeight: 180, textAlign: 'center', background: '#f5f5f5' }}>
-                  <img src={d.certificate.bgParticipant} alt="Desain Peserta" style={{ maxHeight: 180, width: 'auto', objectFit: 'contain' }} />
-                </div>
-              ) : (
-                <div className="empty sm" style={{ border: '2px dashed var(--line)', borderRadius: 10, padding: '16px' }}>
-                  <span className="xs muted">Mengikuti desain juara atau template bawaan</span>
-                </div>
-              )}
-
-              <label className="btn block" style={{ textAlign: 'center', cursor: 'pointer' }}>
-                <Icon n="down" size={17} /> {d.certificate?.bgParticipant ? 'Ganti berkas desain peserta…' : 'Unggah desain sertifikat peserta…'}
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  style={{ display: 'none' }}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    try {
-                      const b64 = await processImage(file);
-                      const c = structuredClone(d.certificate ?? {});
                       c.bgParticipant = b64;
                       setD({ ...d, certificate: c });
-                      toast('Desain peserta berhasil dimuat');
+                      toast('Desain sertifikat berhasil dimuat');
                     } catch (err) {
                       toast((err as Error).message, 'err');
                     }
@@ -212,57 +154,6 @@ export default function Settings() {
                   }}
                 />
               </label>
-            </div>
-
-            <div className="hr" />
-            <div className="eyebrow">Pengaturan Tampilan Cetak</div>
-
-            <div className="row between">
-              <div>
-                <b>Sembunyikan teks pengantar & judul bawaan</b>
-                <div className="xs muted">Hapus "PARISADA XXI", "Sertifikat Kejuaraan", "Diberikan kepada", "yang telah meraih", dan tanggal perkemahan karena sudah tercetak di gambar desain Anda.</div>
-              </div>
-              <Switch
-                on={d.certificate?.hideBoilerplate ?? true}
-                onChange={(v) => {
-                  const c = structuredClone(d.certificate ?? {});
-                  c.hideBoilerplate = v;
-                  setD({ ...d, certificate: c });
-                }}
-                label="Sembunyikan teks pengantar"
-              />
-            </div>
-
-            <div className="row between">
-              <div>
-                <b>Sembunyikan garis bingkai bawaan</b>
-                <div className="xs muted">Sembunyikan garis ganda bawaan agar tidak menabrak bingkai pada desain Anda.</div>
-              </div>
-              <Switch
-                on={d.certificate?.hideBorders ?? Boolean(d.certificate?.bgWinner || d.certificate?.bgParticipant)}
-                onChange={(v) => {
-                  const c = structuredClone(d.certificate ?? {});
-                  c.hideBorders = v;
-                  setD({ ...d, certificate: c });
-                }}
-                label="Sembunyikan garis bingkai"
-              />
-            </div>
-
-            <div className="row between">
-              <div>
-                <b>Sembunyikan garis tanda tangan</b>
-                <div className="xs muted">Sembunyikan kolom tanda tangan bawah jika desain sudah memuat tanda tangan atau cap basah.</div>
-              </div>
-              <Switch
-                on={d.certificate?.hideSignatures ?? false}
-                onChange={(v) => {
-                  const c = structuredClone(d.certificate ?? {});
-                  c.hideSignatures = v;
-                  setD({ ...d, certificate: c });
-                }}
-                label="Sembunyikan garis tanda tangan"
-              />
             </div>
 
             <div className="hr" />
@@ -415,35 +306,13 @@ export default function Settings() {
 
           {/* Pratinjau Langsung */}
           <div className="card pad stack">
-            <div className="row between wrap">
-              <div>
-                <div style={{ fontWeight: 700 }}>Pratinjau Hasil Sertifikat</div>
-                <div className="xs muted">Lihat kecocokan posisi teks terhadap desain latar belakang Anda.</div>
-              </div>
-              <div className="row" style={{ gap: 6 }}>
-                <button
-                  type="button"
-                  className={`btn sm ${previewKind === 'win' ? 'primary' : 'ghost'}`}
-                  onClick={() => setPreviewKind('win')}
-                >
-                  Juara
-                </button>
-                <button
-                  type="button"
-                  className={`btn sm ${previewKind === 'peserta' ? 'primary' : 'ghost'}`}
-                  onClick={() => setPreviewKind('peserta')}
-                >
-                  Peserta
-                </button>
-              </div>
+            <div>
+              <div style={{ fontWeight: 700 }}>Pratinjau Hasil Sertifikat</div>
+              <div className="xs muted">Lihat kecocokan posisi teks terhadap desain latar belakang Anda.</div>
             </div>
             <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--line)' }}>
               <Cert
-                c={
-                  previewKind === 'win'
-                    ? { kind: 'Sertifikat Kejuaraan', label: 'Juara Umum', name: 'Regu Garuda', pangkalan: 'Darul Ulum Banyuanyar', teamId: 'sample-preview' }
-                    : { kind: 'Sertifikat Kegiatan', label: 'Peserta Perkemahan', name: 'Regu Garuda', pangkalan: 'Darul Ulum Banyuanyar', teamId: 'sample-preview' }
-                }
+                c={{ kind: 'Sertifikat Kejuaraan', label: 'Juara Umum', name: 'Regu Garuda', pangkalan: 'Darul Ulum Banyuanyar', teamId: 'sample-preview' }}
                 ev={d.event}
                 certCfg={d.certificate}
               />
