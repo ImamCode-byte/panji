@@ -19,7 +19,7 @@ export default function Login() {
       <form className="card" onSubmit={go}>
         <div className="row" style={{ marginBottom: 22 }}>
           <Mark size={48} />
-          <div><div className="disp" style={{ fontSize: 28, fontWeight: 600, lineHeight: 1 }}>PANJI</div><div className="xs muted">Penilaian Parisada XXI</div></div>
+          <div><div className="disp" style={{ fontSize: 24, fontWeight: 600, lineHeight: 1.1 }}>PANJI PARISADA</div><div className="xs muted">Penilaian Parisada XXI</div></div>
         </div>
         <div className="stack">
           <div className="field"><label htmlFor="u">Username</label>

@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { Icon, Mark } from './components/ui';
 import { DevFooter } from './components/DevFooter';
+import { InstallPrompt } from './components/InstallPrompt';
 import { useApp } from './lib/store';
 import Login from './pages/Login';
 import Public from './pages/Public';
@@ -39,7 +40,7 @@ function Shell() {
   return (
     <div className="shell">
       <aside className="side">
-        <div className="brand"><Mark size={40} /><div><div className="disp" style={{ fontSize: 24, fontWeight: 600, lineHeight: 1, color: '#fff' }}>PANJI</div><div style={{ fontSize: 11.5, opacity: .65 }}>{cfg.event.short}</div></div></div>
+        <div className="brand"><Mark size={40} /><div><div className="disp" style={{ fontSize: 21, fontWeight: 600, lineHeight: 1.1, color: '#fff' }}>PANJI PARISADA</div><div style={{ fontSize: 11.5, opacity: .65 }}>{cfg.event.short}</div></div></div>
         <nav>{items.map((n) => <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => (isActive ? 'on' : '')}><Icon n={n.icon} />{n.label}</NavLink>)}</nav>
         <div className="me">
           <div style={{ fontWeight: 700, color: '#fff' }} className="trunc">{me.name}</div>
@@ -49,7 +50,7 @@ function Shell() {
         </div>
       </aside>
       <div className="main">
-        <header className="topbar"><Mark size={32} /><div className="grow"><div className="t">PANJI</div><div className="s">{cfg.event.short}</div></div><span className="chip dark" style={{ background: 'rgba(255,255,255,.14)' }}>{admin ? 'Admin' : 'Juri'}</span></header>
+        <header className="topbar"><Mark size={32} /><div className="grow"><div className="t">PANJI PARISADA</div><div className="s">{cfg.event.short}</div></div><span className="chip dark" style={{ background: 'rgba(255,255,255,.14)' }}>{admin ? 'Admin' : 'Juri'}</span></header>
         <div className="stripe" />
         {demo && <div className="netbar demo">Mode demo · data hanya tersimpan di perangkat ini</div>}
         {!online && <div className="netbar"><Icon n="wifi" size={16} />Tidak ada sinyal. Nilai disimpan di perangkat{pending ? ` (${pending} menunggu)` : ''}.</div>}
@@ -60,6 +61,7 @@ function Shell() {
         {mobile.map((n) => <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => (isActive ? 'on' : '')}><Icon n={n.icon} />{n.mlabel ?? n.label}</NavLink>)}
         <NavLink to="/app/menu" className={({ isActive }) => (isActive ? 'on' : '')}><Icon n={admin ? 'sliders' : 'user'} />{admin ? 'Kelola' : 'Saya'}</NavLink>
       </nav>
+      <InstallPrompt />
     </div>
   );
 }

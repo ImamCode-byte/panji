@@ -1,1 +1,16 @@
-{"name":"PANJI Parisada XXI","short_name":"PANJI","start_url":"/","display":"standalone","background_color":"#f4efe6","theme_color":"#2b2118","icons":[{"src":"/parisada.png","sizes":"512x512","type":"image/png","purpose":"any"}]}
+{
+  "name": "PANJI PARISADA",
+  "short_name": "PANJI PARISADA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4efe6",
+  "theme_color": "#2b2118",
+  "icons": [
+    {
+      "src": "/parisada.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
