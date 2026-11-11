@@ -12,3 +12,4 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // Biarkan browser menangani request jaringan standar
 });
+
