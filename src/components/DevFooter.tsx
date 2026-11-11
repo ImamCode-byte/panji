@@ -143,7 +143,7 @@ export function DevFooter({ variant = 'full', style }: Props) {
           <div style={{ fontWeight: 800, fontSize: 14.5, letterSpacing: '.01em' }}>
             mamCode
           </div>
-          <div className="xs muted">Pengembang Aplikasi Penilaian PANJI PARISADA</div>
+          <div className="xs muted">Pengembang Aplikasi PANJI PARISADA</div>
         </div>
       </div>
 
