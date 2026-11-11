@@ -9,30 +9,21 @@ import { useApp } from '../lib/store';
 export function ContestList() {
   const { me, cfg, teams, scores, st } = useApp();
   const list = myContests(me, cfg);
-  const groups = useMemo(() => { const m = new Map<string, typeof list>(); list.forEach((c) => m.set(c.hari, [...(m.get(c.hari) ?? []), c])); return [...m]; }, [list]);
   return (
     <div className="page">
       <div className="page-h"><h1>Input nilai</h1></div>
       {!list.length && <div className="card pad muted">Belum ada lomba yang ditugaskan.</div>}
-      <div className="stack lg">
-        {groups.map(([hari, cs]) => (
-          <section key={hari}>
-            <h2 className="eyebrow" style={{ marginBottom: 8 }}>{hari}</h2>
-            <div className="grid g2">
-              {cs.map((c) => {
-                const { done, total } = contestProgress(c.key, teams, scores, st, cfg);
-                return (
-                  <Link key={c.key} to={`/app/input/${c.key}`} className="card pad stack" style={{ gap: 10 }}>
-                    <div className="row between"><b style={{ fontSize: 16 }}>{c.name}</b>
-                      {c.stage ? <span className="chip gold">MSC</span> : !c.inRecap ? <span className="chip">Terpisah</span> : null}</div>
-                    <div className="xs muted">{c.jam} · {c.personil}</div>
-                    <div className="row"><div className="grow"><Progress v={total ? done / total : 0} ok={total > 0 && done >= total} /></div><span className="xs num muted">{done}/{total}</span></div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        ))}
+      <div className="grid g2">
+        {list.map((c) => {
+          const { done, total } = contestProgress(c.key, teams, scores, st, cfg);
+          return (
+            <Link key={c.key} to={`/app/input/${c.key}`} className="card pad stack" style={{ gap: 10 }}>
+              <div className="row between"><b style={{ fontSize: 16 }}>{c.name}</b>
+                {c.stage ? <span className="chip gold">MSC</span> : !c.inRecap ? <span className="chip">Terpisah</span> : null}</div>
+              <div className="row"><div className="grow"><Progress v={total ? done / total : 0} ok={total > 0 && done >= total} /></div><span className="xs num muted">{done}/{total}</span></div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
@@ -55,7 +46,7 @@ export function TeamList() {
     <div className="page">
       <div className="page-h">
         <div><button className="btn ghost sm" style={{ marginLeft: -10 }} onClick={() => nav('/app/input')}><Icon n="back" size={18} />Semua lomba</button>
-          <h1>{def.name}</h1><div className="xs muted" style={{ marginTop: 4 }}>{def.hari} · {def.jam} · {def.personil}</div></div>
+          <h1>{def.name}</h1></div>
         <div style={{ minWidth: 150 }}><div className="xs muted num" style={{ textAlign: 'right', marginBottom: 4 }}>{done} dari {total} dinilai</div><Progress v={total ? done / total : 0} ok={done >= total && total > 0} /></div>
       </div>
       <div className="stack">

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Cert } from '../components/Cert';
-import { Icon, Seg, Switch, fmt } from '../components/ui';
-import { DEFAULT_CONFIG } from '../lib/contests';
+import { Icon, Seg, Sheet, Switch, fmt } from '../components/ui';
+import { DEFAULT_CONFIG, DEFAULT_CONTESTS } from '../lib/contests';
 import { api } from '../lib/data';
 import { roman } from '../lib/scoring';
 import { useApp } from '../lib/store';
-import type { Config } from '../lib/types';
+import type { Config, ContestDef } from '../lib/types';
 
 const num = (s: string) => { const n = parseFloat(s.replace(',', '.')); return Number.isFinite(n) && n >= 0 ? n : 0; };
 
@@ -110,6 +110,49 @@ export default function Settings() {
     return t === 's' || t === 'e' || t === 'l' || t === 'm' || t === 'j' || t === 'd' ? t : 'e';
   });
   const [open, setOpen] = useState<string | null>(null); const [busy, setBusy] = useState(false);
+  const [showAddContest, setShowAddContest] = useState(false);
+  const [newCName, setNewCName] = useState('');
+  const [newCInRecap, setNewCInRecap] = useState(true);
+  const [newCCriteria, setNewCCriteria] = useState<{ label: string; max: number }[]>([
+    { label: 'Penilaian Utama', max: 100 },
+  ]);
+
+  const handleAddContest = () => {
+    const name = newCName.trim();
+    if (!name) return toast('Nama lomba wajib diisi', 'err');
+    const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/^_+|_+$/g, '') || `lomba_${Date.now()}`;
+    let key = slug;
+    let idx = 1;
+    while (d.contests.some((c) => c.key === key)) {
+      key = `${slug}_${++idx}`;
+    }
+    const criteria = newCCriteria.filter((k) => k.label.trim().length > 0).map((k, i) => ({
+      id: `k_${i + 1}`,
+      label: k.label.trim(),
+      max: k.max > 0 ? k.max : 100,
+    }));
+    if (criteria.length === 0) criteria.push({ id: 'k_1', label: 'Penilaian Utama', max: 100 });
+
+    const newDef: ContestDef = {
+      key,
+      name,
+      hari: '',
+      jam: '',
+      personil: 'Regu',
+      inRecap: newCInRecap,
+      criteria,
+      penalties: [],
+      tieBreak: [criteria[0].id],
+      dqNotes: ['Kecurangan', 'Data tidak sesuai dengan peserta'],
+    };
+
+    setD({ ...d, contests: [...d.contests, newDef] });
+    setOpen(key);
+    setShowAddContest(false);
+    setNewCName('');
+    setNewCCriteria([{ label: 'Penilaian Utama', max: 100 }]);
+    toast(`Lomba "${name}" berhasil ditambahkan`);
+  };
   const dirty = JSON.stringify(d) !== JSON.stringify(cfg);
   const save = async () => {
     setBusy(true);
@@ -364,24 +407,55 @@ export default function Settings() {
         </div>}
 
         {tab === 'l' && <div className="stack">
-          <p className="sm muted">Ubah bobot hanya bila panitia memutuskan berbeda dari juklak. Semua nilai dihitung ulang otomatis.</p>
-          {d.contests.map((c) => (
-            <div key={c.key} className="card" style={{ overflow: 'hidden' }}>
-              <button className="li" onClick={() => setOpen(open === c.key ? null : c.key)}>
-                <div className="grow"><b>{c.name}</b><div className="xs muted">{c.stage ? 'Tahap MSC' : c.inRecap ? 'Masuk klasemen umum' : 'Tidak masuk klasemen'}</div></div>
-                <Icon n="chev" size={18} />
-              </button>
-              {open === c.key && <div className="pad stack" style={{ padding: 16, borderTop: '1px solid var(--line)' }}>
-                {c.note && <p className="xs muted">{c.note}</p>}
-                {(!c.stage || c.key === 'msc_penyisihan') && <div className="row between"><span>{c.key === 'msc_penyisihan' ? 'MSC masuk klasemen umum' : 'Masuk klasemen umum'}</span><Switch on={c.inRecap} onChange={(v) => setC(c.key, (x) => { x.inRecap = v; })} label="Masuk klasemen" /></div>}
-                {c.normalizeTo != null && <N l="Skala nilai akhir (normalisasi)" v={c.normalizeTo} on={(n) => setC(c.key, (x) => { x.normalizeTo = n || undefined; })} />}
-                {c.criteria.length > 0 && <div className="eyebrow">Bobot kriteria (poin maksimum)</div>}
-                <div className="grid g2" style={{ gap: 10 }}>{c.criteria.map((k) => <N key={k.id} l={k.label} v={k.max} on={(n) => setC(c.key, (x) => { x.criteria.find((y) => y.id === k.id)!.max = n; })} />)}</div>
-                {c.penalties.length > 0 && <div className="eyebrow">Pengurangan nilai (poin)</div>}
-                <div className="grid g2" style={{ gap: 10 }}>{c.penalties.map((p) => <N key={p.id} l={`${p.label}${p.unit ? ` / ${p.unit}` : ''}`} v={p.points} on={(n) => setC(c.key, (x) => { x.penalties.find((y) => y.id === p.id)!.points = n; })} />)}</div>
-              </div>}
-            </div>
-          ))}
+          <div className="row between wrap" style={{ gap: 8, alignItems: 'center' }}>
+            <p className="sm muted" style={{ margin: 0 }}>Ubah bobot atau tambah lomba baru. Nilai dan klasemen dihitung otomatis.</p>
+            <button type="button" className="btn primary sm" onClick={() => setShowAddContest(true)}>
+              <Icon n="plus" size={17} /> Tambah Lomba
+            </button>
+          </div>
+          {d.contests.map((c) => {
+            const isCustom = !DEFAULT_CONTESTS.some((dc) => dc.key === c.key);
+            return (
+              <div key={c.key} className="card" style={{ overflow: 'hidden' }}>
+                <button className="li" onClick={() => setOpen(open === c.key ? null : c.key)}>
+                  <div className="grow">
+                    <div className="row" style={{ gap: 8, alignItems: 'center' }}>
+                      <b>{c.name}</b>
+                      {isCustom && <span className="chip ok" style={{ fontSize: 10, padding: '2px 6px', height: 'auto' }}>Kustom</span>}
+                    </div>
+                    <div className="xs muted">{c.stage ? 'Tahap MSC' : c.inRecap ? 'Masuk klasemen umum' : 'Tidak masuk klasemen'}</div>
+                  </div>
+                  <Icon n="chev" size={18} />
+                </button>
+                {open === c.key && <div className="pad stack" style={{ padding: 16, borderTop: '1px solid var(--line)' }}>
+                  {c.note && <p className="xs muted">{c.note}</p>}
+                  {(!c.stage || c.key === 'msc_penyisihan') && <div className="row between"><span>{c.key === 'msc_penyisihan' ? 'MSC masuk klasemen umum' : 'Masuk klasemen umum'}</span><Switch on={c.inRecap} onChange={(v) => setC(c.key, (x) => { x.inRecap = v; })} label="Masuk klasemen" /></div>}
+                  {c.normalizeTo != null && <N l="Skala nilai akhir (normalisasi)" v={c.normalizeTo} on={(n) => setC(c.key, (x) => { x.normalizeTo = n || undefined; })} />}
+                  {c.criteria.length > 0 && <div className="eyebrow">Bobot kriteria (poin maksimum)</div>}
+                  <div className="grid g2" style={{ gap: 10 }}>{c.criteria.map((k) => <N key={k.id} l={k.label} v={k.max} on={(n) => setC(c.key, (x) => { x.criteria.find((y) => y.id === k.id)!.max = n; })} />)}</div>
+                  {c.penalties.length > 0 && <div className="eyebrow">Pengurangan nilai (poin)</div>}
+                  <div className="grid g2" style={{ gap: 10 }}>{c.penalties.map((p) => <N key={p.id} l={`${p.label}${p.unit ? ` / ${p.unit}` : ''}`} v={p.points} on={(n) => setC(c.key, (x) => { x.penalties.find((y) => y.id === p.id)!.points = n; })} />)}</div>
+                  {isCustom && (
+                    <div className="row between" style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
+                      <span className="xs muted">Lomba kustom tambahan</span>
+                      <button
+                        type="button"
+                        className="btn danger sm"
+                        onClick={() => {
+                          if (confirm(`Hapus lomba "${c.name}"?`)) {
+                            setD({ ...d, contests: d.contests.filter((x) => x.key !== c.key) });
+                            toast(`Lomba "${c.name}" dihapus`);
+                          }
+                        }}
+                      >
+                        <Icon n="trash" size={16} /> Hapus Lomba
+                      </button>
+                    </div>
+                  )}
+                </div>}
+              </div>
+            );
+          })}
         </div>}
 
         {tab === 'm' && <div className="card pad stack">
@@ -425,6 +499,87 @@ export default function Settings() {
           </div>}
         </div>}
       </div>
+
+      {showAddContest && (
+        <Sheet title="Tambah Lomba Baru" onClose={() => setShowAddContest(false)}>
+          <div className="stack" style={{ gap: 14 }}>
+            <div className="field">
+              <label>Nama Lomba <span style={{ color: 'var(--bad)' }}>*</span></label>
+              <input
+                className="input"
+                placeholder="Contoh: Pionering Menara, Cerdas Cermat, dll."
+                value={newCName}
+                onChange={(e) => setNewCName(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="row between">
+              <div>
+                <b>Masuk Klasemen Umum</b>
+                <div className="xs muted">Nilai lomba ini masuk ke klasemen juara umum regu.</div>
+              </div>
+              <Switch on={newCInRecap} onChange={setNewCInRecap} label="Masuk klasemen" />
+            </div>
+            <div className="hr" />
+            <div className="row between">
+              <b>Kriteria Penilaian</b>
+              <button
+                type="button"
+                className="btn sm"
+                onClick={() => setNewCCriteria([...newCCriteria, { label: `Kriteria ${newCCriteria.length + 1}`, max: 50 }])}
+              >
+                <Icon n="plus" size={15} /> Tambah Kriteria
+              </button>
+            </div>
+            <div className="stack sm">
+              {newCCriteria.map((crit, i) => (
+                <div key={i} className="row" style={{ gap: 8, alignItems: 'center' }}>
+                  <input
+                    className="input sm grow"
+                    placeholder={`Nama kriteria ${i + 1}`}
+                    value={crit.label}
+                    onChange={(e) => {
+                      const next = [...newCCriteria];
+                      next[i].label = e.target.value;
+                      setNewCCriteria(next);
+                    }}
+                  />
+                  <div className="row" style={{ gap: 4, alignItems: 'center', width: 110 }}>
+                    <input
+                      type="number"
+                      className="input sm"
+                      placeholder="Maks"
+                      value={crit.max}
+                      onChange={(e) => {
+                        const next = [...newCCriteria];
+                        next[i].max = parseInt(e.target.value, 10) || 0;
+                        setNewCCriteria(next);
+                      }}
+                      style={{ textAlign: 'center' }}
+                    />
+                    <span className="xs muted">poin</span>
+                  </div>
+                  {newCCriteria.length > 1 && (
+                    <button
+                      type="button"
+                      className="btn ghost icon sm danger"
+                      onClick={() => setNewCCriteria(newCCriteria.filter((_, idx) => idx !== i))}
+                      title="Hapus kriteria"
+                    >
+                      <Icon n="x" size={16} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="row between" style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
+              <button type="button" className="btn" onClick={() => setShowAddContest(false)}>Batal</button>
+              <button type="button" className="btn primary" onClick={handleAddContest}>Tambahkan Lomba</button>
+            </div>
+          </div>
+        </Sheet>
+      )}
+
       {dirty && <div className="foot"><div className="in"><div className="grow sm" style={{ fontWeight: 600 }}>Ada perubahan belum disimpan</div>
         <button className="btn" onClick={() => setD(structuredClone(cfg))}>Batal</button><button className="btn primary" disabled={busy} onClick={save}>{busy ? 'Menyimpan…' : 'Simpan'}</button></div></div>}
     </div>

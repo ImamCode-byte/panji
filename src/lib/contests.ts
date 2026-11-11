@@ -225,6 +225,10 @@ export function mergeConfig(saved: Partial<Config> | null | undefined): Config {
       penalties: d.penalties.map((x) => ({ ...x, points: pm.get(x.id) ?? x.points })),
     };
   });
+  const defaultKeys = new Set(DEFAULT_CONTESTS.map((x) => x.key));
+  for (const s of saved.contests ?? []) {
+    if (!defaultKeys.has(s.key)) contests.push(structuredClone(s));
+  }
   return {
     event: { ...DEFAULT_CONFIG.event, ...saved.event },
     msc: { ...DEFAULT_CONFIG.msc, ...saved.msc },
