@@ -16,10 +16,13 @@ export default function Print() {
       <div className="no-print page-h">
         <div><Link to="/app/juara" className="btn ghost sm" style={{ marginLeft: -10 }}><Icon n="back" size={18} />Juara</Link><h1>Pratinjau cetak</h1>
           <p className="xs muted" style={{ marginTop: 4 }}>{items.length} lembar · A4 lanskap. Pilih “Simpan sebagai PDF” untuk berkas digital. Matikan header/footer di dialog cetak.</p></div>
-        <button className="btn primary" disabled={!items.length} onClick={() => window.print()}><Icon n="print" size={18} />Cetak</button>
+        <div className="row wrap">
+          <Link to="/app/pengaturan?tab=s" className="btn sm"><Icon n="sliders" size={17} />Desain sertifikat</Link>
+          <button className="btn primary" disabled={!items.length} onClick={() => window.print()}><Icon n="print" size={18} />Cetak</button>
+        </div>
       </div>
       {!items.length && <div className="card pad empty">Belum ada yang dicetak. Nilai belum masuk.</div>}
-      {items.map((c, i) => <Cert key={i} c={c} ev={cfg.event} />)}
+      {items.map((c, i) => <Cert key={i} c={c} ev={cfg.event} certCfg={cfg.certificate} />)}
     </div>
   );
 }

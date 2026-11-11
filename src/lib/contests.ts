@@ -189,6 +189,12 @@ export const DEFAULT_CONFIG: Config = {
     AW('Juara Harapan Ramu', 23), AW('Juara Purwa', 26), AW('Juara Harapan Purwa', 29), AW('Juara Madya', 32),
     AW('Juara Harapan Madya', 35), AW('Juara Caraka', 38),
   ],
+  certificate: {
+    bgWinner: '',
+    bgParticipant: '',
+    hideBorders: false,
+    hideSignatures: false,
+  },
 };
 
 /** Gabungkan konfigurasi tersimpan dengan bawaan: nilai tersimpan menang, item baru dari bawaan tetap muncul. */
@@ -211,6 +217,12 @@ export function mergeConfig(saved: Partial<Config> | null | undefined): Config {
     msc: { ...DEFAULT_CONFIG.msc, ...saved.msc },
     awards: saved.awards?.length ? saved.awards : DEFAULT_CONFIG.awards,
     contests,
+    certificate: {
+      bgWinner: saved.certificate?.bgWinner ?? '',
+      bgParticipant: saved.certificate?.bgParticipant ?? '',
+      hideBorders: saved.certificate?.hideBorders ?? false,
+      hideSignatures: saved.certificate?.hideSignatures ?? false,
+    },
   };
 }
 

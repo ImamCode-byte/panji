@@ -14,7 +14,8 @@ export default function Awards() {
   return (
     <div className="page">
       <div className="page-h"><div><div className="eyebrow">{st.complete ? 'Final' : 'Sementara'}</div><h1>Juara</h1></div>
-        <div className="row wrap"><Link className="btn sm" to={print('peserta')}><Icon n="print" size={17} />Sertifikat peserta</Link>
+        <div className="row wrap"><Link className="btn sm" to="/app/pengaturan?tab=s"><Icon n="sliders" size={17} />Desain sertifikat</Link>
+          <Link className="btn sm" to={print('peserta')}><Icon n="print" size={17} />Sertifikat peserta</Link>
           <Link className="btn primary sm" to={print('semua')}><Icon n="print" size={17} />Cetak semua juara</Link></div></div>
       <div className="stack lg">
         <div className="row between wrap"><Seg value={tab} onChange={setTab} opts={[{ v: 'k', l: 'Kategori umum' }, { v: 'l', l: 'Per lomba' }, { v: 'f', l: 'Pangkalan favorit' }]} />

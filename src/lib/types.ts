@@ -18,11 +18,18 @@ export interface ContestDef {
   penalties: Penalty[]; tieBreak: string[]; dqNotes: string[]; note?: string;
 }
 export interface AwardGroup { name: string; start: number; size: number }
+export interface CertConfig {
+  bgWinner?: string;
+  bgParticipant?: string;
+  hideBorders?: boolean;
+  hideSignatures?: boolean;
+}
 export interface Config {
   event: { name: string; short: string; tema: string; lokasi: string; tanggal: string; ketua: string; mabigus: string };
   contests: ContestDef[];
   msc: { wPenyisihan: number; wSemifinal: number; wFinal: number; qSemi: number; qFinal: number };
   awards: AwardGroup[];
+  certificate?: CertConfig;
 }
 
 export interface ScoreData { c: Record<string, (number | null)[]>; p: Record<string, number>; t?: { m: number; s: number } }
