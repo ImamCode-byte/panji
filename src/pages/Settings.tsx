@@ -259,6 +259,91 @@ export default function Settings() {
                   setD({ ...d, certificate: c });
                 }}
               />
+
+              {/* Ukuran Font per Teks berjejer kesamping minimalis */}
+              <div style={{ padding: '10px 12px', background: 'rgba(0,0,0,.02)', borderRadius: 10, border: '1px solid var(--line)' }}>
+                <div className="row between" style={{ marginBottom: 6 }}>
+                  <b style={{ fontSize: 13.5 }}>Ukuran Font (px)</b>
+                  {(d.certificate?.nameSize !== 54 || d.certificate?.pangkalanSize !== 27 || d.certificate?.awardSize !== 40) && (
+                    <button
+                      type="button"
+                      className="btn ghost sm"
+                      style={{ padding: '0 6px', height: 22, fontSize: 11 }}
+                      onClick={() => {
+                        const c = structuredClone(d.certificate ?? {});
+                        c.nameSize = 54;
+                        c.pangkalanSize = 27;
+                        c.awardSize = 40;
+                        setD({ ...d, certificate: c });
+                      }}
+                    >
+                      Reset ukuran
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                  <div>
+                    <div className="xs muted trunc" style={{ marginBottom: 4 }} title="Regu Garuda">Regu Garuda</div>
+                    <div className="row" style={{ gap: 4, alignItems: 'center' }}>
+                      <input
+                        type="number"
+                        min="12"
+                        max="120"
+                        className="input sm"
+                        style={{ width: '100%', padding: '4px 6px', height: 30, fontSize: 13, textAlign: 'center' }}
+                        value={d.certificate?.nameSize ?? 54}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          const c = structuredClone(d.certificate ?? {});
+                          c.nameSize = Number.isFinite(val) && val > 0 ? val : 54;
+                          setD({ ...d, certificate: c });
+                        }}
+                      />
+                      <span className="xs muted">px</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="xs muted trunc" style={{ marginBottom: 4 }} title="Darul Ulum Banyuanyar">Darul Ulum…</div>
+                    <div className="row" style={{ gap: 4, alignItems: 'center' }}>
+                      <input
+                        type="number"
+                        min="10"
+                        max="80"
+                        className="input sm"
+                        style={{ width: '100%', padding: '4px 6px', height: 30, fontSize: 13, textAlign: 'center' }}
+                        value={d.certificate?.pangkalanSize ?? 27}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          const c = structuredClone(d.certificate ?? {});
+                          c.pangkalanSize = Number.isFinite(val) && val > 0 ? val : 27;
+                          setD({ ...d, certificate: c });
+                        }}
+                      />
+                      <span className="xs muted">px</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="xs muted trunc" style={{ marginBottom: 4 }} title="Juara Umum">Juara Umum</div>
+                    <div className="row" style={{ gap: 4, alignItems: 'center' }}>
+                      <input
+                        type="number"
+                        min="10"
+                        max="100"
+                        className="input sm"
+                        style={{ width: '100%', padding: '4px 6px', height: 30, fontSize: 13, textAlign: 'center' }}
+                        value={d.certificate?.awardSize ?? 40}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          const c = structuredClone(d.certificate ?? {});
+                          c.awardSize = Number.isFinite(val) && val > 0 ? val : 40;
+                          setD({ ...d, certificate: c });
+                        }}
+                      />
+                      <span className="xs muted">px</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

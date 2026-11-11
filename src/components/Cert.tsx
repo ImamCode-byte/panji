@@ -11,6 +11,10 @@ export function Cert({ c, certCfg }: { c: CertItem; ev?: Config['event']; certCf
   const awY = certCfg?.awardY ?? certCfg?.textOffsetY ?? 0;
   const textAlign = certCfg?.textAlign ?? 'center';
 
+  const nameSize = certCfg?.nameSize ? `${(certCfg.nameSize / 11.23).toFixed(2)}cqw` : undefined;
+  const pgSize = certCfg?.pangkalanSize ? `${(certCfg.pangkalanSize / 11.23).toFixed(2)}cqw` : undefined;
+  const awSize = certCfg?.awardSize ? `${(certCfg.awardSize / 11.23).toFixed(2)}cqw` : undefined;
+
   return (
     <div className="cert-wrap">
       <div
@@ -18,9 +22,9 @@ export function Cert({ c, certCfg }: { c: CertItem; ev?: Config['event']; certCf
         style={bg ? { backgroundImage: `url(${bg})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : undefined}
       >
         <div className="cert-dynamic" style={{ textAlign, width: '100%', margin: 'auto 0' }}>
-          <div className="nm" style={{ transform: `translate(${nameX}cqw, ${nameY}cqw)` }}>{c.name}</div>
-          <div className="pg" style={{ transform: `translate(${pgX}cqw, ${pgY}cqw)` }}>{c.pangkalan}</div>
-          <div className="jr" style={{ transform: `translate(${awX}cqw, ${awY}cqw)` }}>{c.label}</div>
+          <div className="nm" style={{ transform: `translate(${nameX}cqw, ${nameY}cqw)`, fontSize: nameSize }}>{c.name}</div>
+          <div className="pg" style={{ transform: `translate(${pgX}cqw, ${pgY}cqw)`, fontSize: pgSize }}>{c.pangkalan}</div>
+          <div className="jr" style={{ transform: `translate(${awX}cqw, ${awY}cqw)`, fontSize: awSize }}>{c.label}</div>
         </div>
       </div>
     </div>

@@ -203,6 +203,9 @@ export const DEFAULT_CONFIG: Config = {
     pangkalanY: 0,
     awardX: 0,
     awardY: 0,
+    nameSize: 54,
+    pangkalanSize: 27,
+    awardSize: 40,
     textAlign: 'center',
   },
 };
@@ -241,6 +244,9 @@ export function mergeConfig(saved: Partial<Config> | null | undefined): Config {
       pangkalanY: saved.certificate?.pangkalanY ?? saved.certificate?.textOffsetY ?? 0,
       awardX: saved.certificate?.awardX ?? saved.certificate?.textOffsetX ?? 0,
       awardY: saved.certificate?.awardY ?? saved.certificate?.textOffsetY ?? 0,
+      nameSize: saved.certificate?.nameSize ?? 54,
+      pangkalanSize: saved.certificate?.pangkalanSize ?? 27,
+      awardSize: saved.certificate?.awardSize ?? 40,
       textAlign: saved.certificate?.textAlign ?? 'center',
     },
   };

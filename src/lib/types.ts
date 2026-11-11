@@ -32,6 +32,9 @@ export interface CertConfig {
   pangkalanY?: number;
   awardX?: number;
   awardY?: number;
+  nameSize?: number;
+  pangkalanSize?: number;
+  awardSize?: number;
   textAlign?: 'center' | 'left' | 'right';
 }
 export interface Config {
