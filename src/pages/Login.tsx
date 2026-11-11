@@ -17,7 +17,7 @@ export default function Login() {
     <div className="auth">
       <form className="card" onSubmit={go}>
         <div className="row" style={{ marginBottom: 22 }}>
-          <div style={{ background: 'var(--brand)', borderRadius: 14 }}><Mark size={46} /></div>
+          <Mark size={48} />
           <div><div className="disp" style={{ fontSize: 28, fontWeight: 600, lineHeight: 1 }}>PANJI</div><div className="xs muted">Penilaian Parisada XXI</div></div>
         </div>
         <div className="stack">

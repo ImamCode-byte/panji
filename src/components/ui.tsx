@@ -29,8 +29,15 @@ export const Icon = ({ n, size = 20 }: { n: keyof typeof P | string; size?: numb
     {(P[n] ?? '').split(' M').map((d, i) => <path key={i} d={(i ? 'M' : '') + d} />)}
   </svg>
 );
-export const Mark = ({ size = 34 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden><rect width="64" height="64" rx="14" fill="#e9d9b8" opacity=".14" /><path d="M20 12v42" stroke="#e9d9b8" strokeWidth="4" strokeLinecap="round" /><path d="M24 14h24l-7 9 7 9H24z" fill="#d9952b" /></svg>
+export const Mark = ({ size = 34, className }: { size?: number; className?: string }) => (
+  <img
+    src="/parisada.png"
+    alt="Logo Parisada XXI"
+    width={size}
+    height={size}
+    className={className}
+    style={{ width: size, height: size, objectFit: 'contain', display: 'inline-block', verticalAlign: 'middle' }}
+  />
 );
 
 export const fmt = (n: number | null | undefined, d = 2) => (n == null ? '—' : n.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: d }));
