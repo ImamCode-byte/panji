@@ -206,25 +206,7 @@ export default function Settings() {
             </div>
 
             <div className="hr" />
-            <div className="row between wrap" style={{ gap: 8 }}>
-              <div className="eyebrow" style={{ margin: 0 }}>Posisi Teks</div>
-              <div className="row" style={{ gap: 6, alignItems: 'center' }}>
-                <span className="xs muted">Perataan:</span>
-                <Seg
-                  value={d.certificate?.textAlign ?? 'center'}
-                  onChange={(v) => {
-                    const c = structuredClone(d.certificate ?? {});
-                    c.textAlign = v as 'center' | 'left' | 'right';
-                    setD({ ...d, certificate: c });
-                  }}
-                  opts={[
-                    { v: 'left', l: 'Kiri' },
-                    { v: 'center', l: 'Tengah' },
-                    { v: 'right', l: 'Kanan' },
-                  ]}
-                />
-              </div>
-            </div>
+            <div className="eyebrow">Posisi Teks</div>
 
             <div className="stack sm">
               <PosControl
