@@ -33,6 +33,12 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
   const [tm, setTm] = useState(str(existing?.data.t?.m)); const [ts, setTs] = useState(str(existing?.data.t?.s));
   const [dq, setDq] = useState(existing?.dq ?? false); const [note, setNote] = useState(existing?.note ?? '');
   const [busy, setBusy] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const isAdmin = me?.role === 'admin';
+  const isSaved = !!existing;
+  const isLocked = !isAdmin && isSaved && !existing?.data?.unlocked;
+  const isUnlockedByAdmin = !isAdmin && isSaved && !!existing?.data?.unlocked;
 
   const bad = (c: (typeof def.criteria)[number], i: number) => {
     const n = toNum(vals[c.id][i]); if (n == null) return false;
@@ -54,15 +60,48 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
     const after = list.filter((t) => t.no > team.no && !scores.some((s) => s.contest === def.key && s.team_id === t.id));
     return after[0]?.id;
   };
-  const save = async () => {
+
+  const handlePromptSave = () => {
+    if (isLocked) return;
     if (invalid) { toast('Ada isian di luar batas nilai', 'err'); return; }
+    setConfirmOpen(true);
+  };
+
+  const executeSave = async () => {
     setBusy(true);
     try {
-      const r = await saveScore({ team_id: teamId, contest: def.key, data: dq ? { c: {}, p: {} } : data, dq, note: note.trim() });
-      toast(r === 'queued' ? 'Disimpan di perangkat, menunggu sinyal' : empties && !dq ? `Tersimpan · ${empties} isian masih kosong` : 'Nilai tersimpan');
+      const payloadData: ScoreData = {
+        ...(dq ? { c: {}, p: {} } : data),
+        locked: true,
+        unlocked: false, // otomatis kunci kembali setelah disimpan
+      };
+      const r = await saveScore({ team_id: teamId, contest: def.key, data: payloadData, dq, note: note.trim() });
+      setConfirmOpen(false);
+      toast(r === 'queued' ? 'Disimpan di perangkat, menunggu sinyal' : isSaved ? 'Perubahan disimpan & nilai dikunci' : 'Nilai tersimpan & dikunci');
       onDone(nextTeam());
     } catch (e) { toast((e as Error).message, 'err'); } finally { setBusy(false); }
   };
+
+  const toggleAdminLock = async () => {
+    if (!existing) return;
+    const willUnlock = !existing.data?.unlocked;
+    setBusy(true);
+    try {
+      await saveScore({
+        team_id: teamId,
+        contest: def.key,
+        data: { ...existing.data, unlocked: willUnlock },
+        dq: existing.dq,
+        note: existing.note,
+      });
+      toast(willUnlock ? 'Kunci dibuka. Juri diizinkan mengubah nilai.' : 'Nilai dikunci kembali.');
+    } catch (e) {
+      toast((e as Error).message, 'err');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const del = async () => {
     if (!confirm('Hapus nilai regu ini?')) return;
     try { await removeScore(teamId, def.key); toast('Nilai dihapus'); onDone(); } catch (e) { toast((e as Error).message, 'err'); }
@@ -79,10 +118,60 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
         <span className="noBadge" style={{ width: 48, height: 48, fontSize: 18, borderRadius: 12 }}>{String(team.no).padStart(2, '0')}</span>
         <div className="grow"><div className="disp" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1.15 }}>{team.name}</div><div className="xs muted trunc">{team.pangkalan}</div></div>
       </div>
-      {existing && <p className="xs muted" style={{ marginBottom: 12 }}>Sudah dinilai{by ? ` oleh ${by}` : ''}{existing.updated_at ? ` · ${hhmm(existing.updated_at)}` : ''}</p>}
+
+      <div className="row between wrap" style={{ gap: 8, alignItems: 'center', marginBottom: 12 }}>
+        <div className="xs muted">
+          {existing ? (
+            <>Sudah dinilai{by ? ` oleh ${by}` : ''}{existing.updated_at ? ` · ${hhmm(existing.updated_at)}` : ''}</>
+          ) : (
+            <span>Belum dinilai</span>
+          )}
+        </div>
+        {isAdmin && existing && (
+          <button
+            type="button"
+            className={`btn sm ${existing.data?.unlocked ? 'danger' : 'secondary'}`}
+            onClick={toggleAdminLock}
+            disabled={busy}
+            style={{ height: 30, fontSize: 12 }}
+          >
+            <Icon n={existing.data?.unlocked ? 'lock' : 'unlock'} size={15} />
+            {existing.data?.unlocked ? 'Kunci Kembali' : 'Buka Kunci (Izinkan Juri Ubah)'}
+          </button>
+        )}
+      </div>
+
+      {isLocked && (
+        <div className="card pad" style={{ background: '#fffbeb', border: '1px solid #f59e0b', color: '#92400e', marginBottom: 14 }}>
+          <div className="row" style={{ gap: 10, alignItems: 'flex-start' }}>
+            <div style={{ marginTop: 2 }}><Icon n="lock" size={20} /></div>
+            <div>
+              <b style={{ color: '#78350f', fontSize: 14 }}>Nilai Telah Dikunci</b>
+              <div className="xs" style={{ marginTop: 4, lineHeight: 1.45 }}>
+                Nilai regu ini sudah disimpan dan tidak dapat diubah lagi oleh juri. Jika terdapat kesalahan penginputan, hubungi <b>Admin</b> untuk meminta izin buka kunci nilai.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isUnlockedByAdmin && (
+        <div className="card pad" style={{ background: '#f0fdf4', border: '1px solid #22c55e', color: '#166534', marginBottom: 14 }}>
+          <div className="row" style={{ gap: 10, alignItems: 'flex-start' }}>
+            <div style={{ marginTop: 2 }}><Icon n="unlock" size={20} /></div>
+            <div>
+              <b style={{ color: '#14532d', fontSize: 14 }}>Izin Edit Diberikan oleh Admin</b>
+              <div className="xs" style={{ marginTop: 4, lineHeight: 1.45 }}>
+                Admin telah membuka kunci nilai ini. Silakan perbaiki data. Setelah menekan tombol <b>Simpan</b>, nilai akan <b>otomatis terkunci kembali</b>.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {def.note && <p className="xs muted" style={{ marginBottom: 12 }}>{def.note}</p>}
 
-      <div className="stack lg" style={{ maxWidth: 760 }}>
+      <div className="stack lg" style={{ maxWidth: 760, ...(isLocked ? { pointerEvents: 'none', opacity: 0.62, userSelect: 'none' } : {}) }}>
         <div className={dq ? 'dqbox' : 'card pad'}>
           <div className="row between"><div><b>Diskualifikasi</b><div className="xs muted">Nilai lomba ini menjadi 0</div></div><Switch bad on={dq} onChange={setDq} label="Diskualifikasi" /></div>
           {dq && <div className="stack" style={{ marginTop: 12 }}>
@@ -151,8 +240,52 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
           <div className="sc2 num">{fmt(cs.score)}<span className="faint" style={{ fontSize: 15, fontFamily: 'var(--f)' }}> / {fmt(max)}</span></div>
           {!dq && empties > 0 && <div className="xs" style={{ color: 'var(--accent)', fontWeight: 700 }}>{empties} isian kosong dihitung 0</div>}
         </div>
-        <button className="btn primary" style={{ minWidth: 150 }} disabled={busy} onClick={save}><Icon n="check" size={18} />{busy ? 'Menyimpan…' : 'Simpan'}</button>
+        {isLocked ? (
+          <button type="button" className="btn" disabled style={{ minWidth: 150, opacity: 0.8, cursor: 'not-allowed' }}>
+            <Icon n="lock" size={17} /> Nilai Terkunci
+          </button>
+        ) : (
+          <button type="button" className="btn primary" style={{ minWidth: 150 }} disabled={busy} onClick={handlePromptSave}>
+            <Icon n="check" size={18} />
+            {busy ? 'Menyimpan…' : isUnlockedByAdmin ? 'Simpan Perubahan' : 'Simpan'}
+          </button>
+        )}
       </div></div>
+
+      {confirmOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1200,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+        }}>
+          <div className="card pad stack" style={{ maxWidth: 440, width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
+            <div className="row" style={{ gap: 10, alignItems: 'center' }}>
+              <span style={{ fontSize: 26 }}>🔒</span>
+              <div>
+                <b style={{ fontSize: 16 }}>{isSaved ? 'Konfirmasi Simpan Perubahan' : 'Konfirmasi Simpan Nilai'}</b>
+                <div className="xs muted">Regu {team.name} ({team.pangkalan})</div>
+              </div>
+            </div>
+            <p className="sm" style={{ margin: '10px 0', lineHeight: 1.5 }}>
+              {isSaved
+                ? `Perubahan nilai akan disimpan. Setelah ini, nilai akan OTOMATIS TERKUNCI KEMBALI dan Anda harus meminta izin Admin lagi jika ingin mengubahnya.`
+                : `Pastikan semua data nilai regu "${team.name}" sudah benar. Setelah disimpan, nilai ini akan LANGSUNG DIKUNCI dan Anda TIDAK BISA mengubahnya lagi kecuali diizinkan oleh Admin.`}
+            </p>
+            <div className="row wrap between" style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--line)', gap: 8 }}>
+              <button type="button" className="btn" onClick={() => { setConfirmOpen(false); nav(); }} disabled={busy}>
+                Batal (Kembali)
+              </button>
+              <div className="row" style={{ gap: 8 }}>
+                <button type="button" className="btn ghost sm" onClick={() => setConfirmOpen(false)} disabled={busy}>
+                  Cek Lagi
+                </button>
+                <button type="button" className="btn primary" onClick={executeSave} disabled={busy}>
+                  {busy ? 'Menyimpan…' : 'Oke, Simpan'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

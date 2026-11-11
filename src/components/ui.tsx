@@ -23,6 +23,8 @@ const P: Record<string, string> = {
   flag: 'M6 21V4 M6 5h12l-3 4 3 4H6',
   pencil: 'M4 20l4-1L19 8l-3-3L5 16z M14 7l3 3',
   wifi: 'M3 9a15 15 0 0 1 18 0 M6 12.5a10 10 0 0 1 12 0 M9 16a5 5 0 0 1 6 0 M12 19.5v.01',
+  lock: 'M7 11V7a5 5 0 0 1 10 0v4 M5 11h14v10H5z M12 15v2',
+  unlock: 'M7 11V7a5 5 0 0 1 9.9-1 M5 11h14v10H5z M12 15v2',
 };
 export const Icon = ({ n, size = 20 }: { n: keyof typeof P | string; size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

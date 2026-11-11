@@ -64,8 +64,21 @@ export function TeamList() {
                 <span className="noBadge">{String(t.no).padStart(2, '0')}</span>
                 <div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{t.name}</div><div className="trunc xs muted">{t.pangkalan}</div></div>
                 {!r ? <span className="chip">Belum</span> : cs!.dq ? <span className="chip bad">Diskualifikasi</span> : (
-                  <div style={{ textAlign: 'right' }}><div className="num" style={{ fontWeight: 800, fontSize: 16 }}>{fmt(cs!.score)}</div>
-                    {!cs!.complete ? <span className="chip gold" style={{ height: 20, fontSize: 11 }}>Belum lengkap</span> : rankMap.get(t.id) ? <div className="xs faint">peringkat {rankMap.get(t.id)}</div> : null}</div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div className="row" style={{ gap: 6, justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {r.data?.unlocked ? (
+                        <span className="chip ok" style={{ fontSize: 10, padding: '2px 6px', height: 'auto' }} title="Admin mengizinkan juri mengubah nilai">
+                          <Icon n="unlock" size={12} /> Buka
+                        </span>
+                      ) : (
+                        <span className="chip" style={{ fontSize: 10, padding: '2px 6px', height: 'auto' }} title="Nilai terkunci">
+                          <Icon n="lock" size={12} /> Kunci
+                        </span>
+                      )}
+                      <div className="num" style={{ fontWeight: 800, fontSize: 16 }}>{fmt(cs!.score)}</div>
+                    </div>
+                    {!cs!.complete ? <span className="chip gold" style={{ height: 20, fontSize: 11 }}>Belum lengkap</span> : rankMap.get(t.id) ? <div className="xs faint">peringkat {rankMap.get(t.id)}</div> : null}
+                  </div>
                 )}
                 <Icon n="chev" size={18} />
               </Link>

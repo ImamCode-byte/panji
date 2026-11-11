@@ -45,7 +45,13 @@ export interface Config {
   certificate?: CertConfig;
 }
 
-export interface ScoreData { c: Record<string, (number | null)[]>; p: Record<string, number>; t?: { m: number; s: number } }
+export interface ScoreData {
+  c: Record<string, (number | null)[]>;
+  p: Record<string, number>;
+  t?: { m: number; s: number };
+  locked?: boolean;
+  unlocked?: boolean;
+}
 export interface ScoreRec {
   team_id: string; contest: string; data: ScoreData; dq: boolean; note: string;
   updated_by?: string | null; updated_at?: string; by_name?: string;
