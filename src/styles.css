@@ -161,7 +161,8 @@ table.t{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 .stepper input{flex:1;min-width:0;width:100%;border:0;outline:none;text-align:center;font-size:19px;font-weight:700;background:transparent;font-variant-numeric:tabular-nums}
 .rl{font-size:11.5px;color:var(--ink3);font-weight:600;margin-bottom:3px}
 .sec-t{padding:10px 14px;background:#f4eee0;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
-.foot{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--card);border-top:1px solid var(--line2);padding:10px 14px calc(10px + var(--safe-b));box-shadow:0 -8px 24px -14px rgba(51,38,26,.4)}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:100;background:var(--card);border-top:1px solid var(--line2);padding:10px 14px calc(10px + var(--safe-b));box-shadow:0 -8px 24px -14px rgba(51,38,26,.4)}
+body:has(.foot) .tabbar{display:none!important}
 .foot .in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:12px}
 @media(min-width:900px){.foot{left:236px}}
 .foot .sc2{font-family:var(--fd);font-size:30px;font-weight:600;line-height:1}
@@ -191,7 +192,8 @@ table.t{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 /* version badge */
 .ver-badge{position:fixed;right:14px;bottom:calc(14px + var(--safe-b));z-index:9999;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.03em;padding:4px 10px;border-radius:99px;background:rgba(35,26,18,.9);color:#fbf1de;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(251,241,222,.25);box-shadow:0 4px 14px rgba(0,0,0,.3);pointer-events:none;user-select:none;line-height:1.2}
 .ver-badge.in-app{bottom:calc(66px + var(--safe-b))}
-@media(min-width:900px){.ver-badge,.ver-badge.in-app{bottom:14px;right:16px;font-size:11.5px}}
+.ver-badge.on-score-form{bottom:calc(76px + var(--safe-b))}
+@media(min-width:900px){.ver-badge,.ver-badge.in-app,.ver-badge.on-score-form{bottom:14px;right:16px;font-size:11.5px}}
 
 .print-only{display:none}
 @media(prefers-reduced-motion:reduce){

@@ -38,6 +38,7 @@ function Shell() {
   const admin = me.role === 'admin';
   const items = NAV.filter((n) => admin || !n.admin);
   const mobile = items.filter((n) => n.m);
+  const isScoreForm = /^\/app\/input\/[^/]+\/[^/]+/.test(loc.pathname);
   return (
     <div className="shell">
       <aside className="side">
@@ -58,10 +59,12 @@ function Shell() {
         {online && pending > 0 && <div className="netbar"><Icon n="refresh" size={16} />Mengirim {pending} nilai tertunda…</div>}
         <Outlet />
       </div>
-      <nav className="tabbar" aria-label="Navigasi">
-        {mobile.map((n) => <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => (isActive ? 'on' : '')}><Icon n={n.icon} />{n.mlabel ?? n.label}</NavLink>)}
-        <NavLink to="/app/menu" className={({ isActive }) => (isActive ? 'on' : '')}><Icon n={admin ? 'sliders' : 'user'} />{admin ? 'Kelola' : 'Saya'}</NavLink>
-      </nav>
+      {!isScoreForm && (
+        <nav className="tabbar" aria-label="Navigasi">
+          {mobile.map((n) => <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => (isActive ? 'on' : '')}><Icon n={n.icon} />{n.mlabel ?? n.label}</NavLink>)}
+          <NavLink to="/app/menu" className={({ isActive }) => (isActive ? 'on' : '')}><Icon n={admin ? 'sliders' : 'user'} />{admin ? 'Kelola' : 'Saya'}</NavLink>
+        </nav>
+      )}
       <InstallPrompt />
     </div>
   );

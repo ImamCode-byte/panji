@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { fmt, Icon, Stepper, Switch } from '../components/ui';
 import { canJudge } from '../lib/access';
@@ -234,23 +235,28 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
         {existing && me?.role === 'admin' && <button className="btn danger sm" style={{ alignSelf: 'flex-start' }} onClick={del}><Icon n="trash" size={17} />Hapus nilai</button>}
       </div>
 
-      <div className="foot"><div className="in">
-        <div className="grow">
-          <div className="xs muted">{dq ? 'Diskualifikasi' : cs.penalty ? `Dikurangi ${fmt(cs.penalty)}` : 'Nilai'}</div>
-          <div className="sc2 num">{fmt(cs.score)}<span className="faint" style={{ fontSize: 15, fontFamily: 'var(--f)' }}> / {fmt(max)}</span></div>
-          {!dq && empties > 0 && <div className="xs" style={{ color: 'var(--accent)', fontWeight: 700 }}>{empties} isian kosong dihitung 0</div>}
-        </div>
-        {isLocked ? (
-          <button type="button" className="btn" disabled style={{ minWidth: 150, opacity: 0.8, cursor: 'not-allowed' }}>
-            <Icon n="lock" size={17} /> Nilai Terkunci
-          </button>
-        ) : (
-          <button type="button" className="btn primary" style={{ minWidth: 150 }} disabled={busy} onClick={handlePromptSave}>
-            <Icon n="check" size={18} />
-            {busy ? 'Menyimpan…' : isUnlockedByAdmin ? 'Simpan Perubahan' : 'Simpan'}
-          </button>
-        )}
-      </div></div>
+      {createPortal(
+        <div className="foot">
+          <div className="in">
+            <div className="grow">
+              <div className="xs muted">{dq ? 'Diskualifikasi' : cs.penalty ? `Dikurangi ${fmt(cs.penalty)}` : 'Nilai'}</div>
+              <div className="sc2 num">{fmt(cs.score)}<span className="faint" style={{ fontSize: 15, fontFamily: 'var(--f)' }}> / {fmt(max)}</span></div>
+              {!dq && empties > 0 && <div className="xs" style={{ color: 'var(--accent)', fontWeight: 700 }}>{empties} isian kosong dihitung 0</div>}
+            </div>
+            {isLocked ? (
+              <button type="button" className="btn" disabled style={{ minWidth: 150, opacity: 0.8, cursor: 'not-allowed' }}>
+                <Icon n="lock" size={17} /> Nilai Terkunci
+              </button>
+            ) : (
+              <button type="button" className="btn primary" style={{ minWidth: 150 }} disabled={busy} onClick={handlePromptSave}>
+                <Icon n="check" size={18} />
+                {busy ? 'Menyimpan…' : isUnlockedByAdmin ? 'Simpan Perubahan' : 'Simpan'}
+              </button>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
 
       {confirmOpen && (
         <div style={{
