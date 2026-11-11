@@ -52,6 +52,55 @@ const N = ({ l, v, on }: { l: string; v: number; on: (n: number) => void }) => (
   <div className="field"><label>{l}</label><input className="input" inputMode="decimal" defaultValue={String(v).replace('.', ',')} onChange={(e) => on(num(e.target.value))} /></div>
 );
 
+const PosControl = ({
+  label,
+  sample,
+  x,
+  y,
+  onChangeX,
+  onChangeY,
+}: {
+  label: string;
+  sample: string;
+  x: number;
+  y: number;
+  onChangeX: (n: number) => void;
+  onChangeY: (n: number) => void;
+}) => (
+  <div style={{ padding: '10px 12px', background: 'rgba(0,0,0,.02)', borderRadius: 10, border: '1px solid var(--line)' }}>
+    <div className="row between" style={{ marginBottom: 6 }}>
+      <div>
+        <b style={{ fontSize: 13.5 }}>{label}</b>
+        <span className="xs muted" style={{ marginLeft: 6 }}>“{sample}”</span>
+      </div>
+      {(x !== 0 || y !== 0) && (
+        <button
+          type="button"
+          className="btn ghost sm"
+          style={{ padding: '0 6px', height: 22, fontSize: 11 }}
+          onClick={() => { onChangeX(0); onChangeY(0); }}
+        >
+          Reset
+        </button>
+      )}
+    </div>
+    <div className="grid g2" style={{ gap: 8 }}>
+      <div className="row" style={{ gap: 6, alignItems: 'center' }}>
+        <span className="xs muted" style={{ minWidth: 38, fontVariantNumeric: 'tabular-nums' }}>X {x > 0 ? `+${x}` : x}</span>
+        <button type="button" className="btn sm icon" style={{ width: 28, height: 28, minWidth: 28, padding: 0 }} onClick={() => onChangeX(x - 1)} title="Geser kiri">◀</button>
+        <input type="range" min="-30" max="30" step="1" value={x} onChange={(e) => onChangeX(parseInt(e.target.value, 10))} style={{ flex: 1, accentColor: 'var(--accent)' }} />
+        <button type="button" className="btn sm icon" style={{ width: 28, height: 28, minWidth: 28, padding: 0 }} onClick={() => onChangeX(x + 1)} title="Geser kanan">▶</button>
+      </div>
+      <div className="row" style={{ gap: 6, alignItems: 'center' }}>
+        <span className="xs muted" style={{ minWidth: 38, fontVariantNumeric: 'tabular-nums' }}>Y {y > 0 ? `+${y}` : y}</span>
+        <button type="button" className="btn sm icon" style={{ width: 28, height: 28, minWidth: 28, padding: 0 }} onClick={() => onChangeY(y - 1)} title="Naik">▲</button>
+        <input type="range" min="-35" max="35" step="1" value={y} onChange={(e) => onChangeY(parseInt(e.target.value, 10))} style={{ flex: 1, accentColor: 'var(--accent)' }} />
+        <button type="button" className="btn sm icon" style={{ width: 28, height: 28, minWidth: 28, padding: 0 }} onClick={() => onChangeY(y + 1)} title="Turun">▼</button>
+      </div>
+    </div>
+  </div>
+);
+
 export default function Settings() {
   const { cfg, act, toast, demo, teams } = useApp();
   const [sp] = useSearchParams();
@@ -157,149 +206,76 @@ export default function Settings() {
             </div>
 
             <div className="hr" />
-            <div className="eyebrow">Posisi Teks (Nama, Pangkalan, Gelar Juara)</div>
-
-            <div className="stack sm">
-              <div className="row between">
-                <div>
-                  <b>Geser Kiri ↔ Kanan (Horizontal)</b>
-                  <div className="xs muted">Atur posisi horizontal teks agar tepat berada pada kolom desain sertifikat Anda.</div>
-                </div>
-                <div className="num" style={{ fontWeight: 700, minWidth: 60, textAlign: 'right' }}>
-                  {(d.certificate?.textOffsetX ?? 0) > 0 ? `+${d.certificate?.textOffsetX} %` : `${d.certificate?.textOffsetX ?? 0} %`}
-                </div>
-              </div>
-              <div className="row" style={{ gap: 10, alignItems: 'center' }}>
-                <button
-                  type="button"
-                  className="btn sm"
-                  onClick={() => {
+            <div className="row between wrap" style={{ gap: 8 }}>
+              <div className="eyebrow" style={{ margin: 0 }}>Posisi Teks</div>
+              <div className="row" style={{ gap: 6, alignItems: 'center' }}>
+                <span className="xs muted">Perataan:</span>
+                <Seg
+                  value={d.certificate?.textAlign ?? 'center'}
+                  onChange={(v) => {
                     const c = structuredClone(d.certificate ?? {});
-                    c.textOffsetX = (c.textOffsetX ?? 0) - 2;
+                    c.textAlign = v as 'center' | 'left' | 'right';
                     setD({ ...d, certificate: c });
                   }}
-                  title="Geser ke kiri 2%"
-                >
-                  ◀ Kiri
-                </button>
-                <input
-                  type="range"
-                  min="-30"
-                  max="30"
-                  step="1"
-                  value={d.certificate?.textOffsetX ?? 0}
-                  onChange={(e) => {
-                    const c = structuredClone(d.certificate ?? {});
-                    c.textOffsetX = parseInt(e.target.value, 10);
-                    setD({ ...d, certificate: c });
-                  }}
-                  style={{ flex: 1, accentColor: 'var(--accent)' }}
+                  opts={[
+                    { v: 'left', l: 'Kiri' },
+                    { v: 'center', l: 'Tengah' },
+                    { v: 'right', l: 'Kanan' },
+                  ]}
                 />
-                <button
-                  type="button"
-                  className="btn sm"
-                  onClick={() => {
-                    const c = structuredClone(d.certificate ?? {});
-                    c.textOffsetX = (c.textOffsetX ?? 0) + 2;
-                    setD({ ...d, certificate: c });
-                  }}
-                  title="Geser ke kanan 2%"
-                >
-                  Kanan ▶
-                </button>
-                <button
-                  type="button"
-                  className="btn ghost sm"
-                  onClick={() => {
-                    const c = structuredClone(d.certificate ?? {});
-                    c.textOffsetX = 0;
-                    setD({ ...d, certificate: c });
-                  }}
-                >
-                  Pusat (0)
-                </button>
               </div>
             </div>
 
             <div className="stack sm">
-              <div className="row between">
-                <div>
-                  <b>Geser Atas ↕ Bawah (Vertikal)</b>
-                  <div className="xs muted">Naikkan atau turunkan posisi teks agar pas di garis tanda tangan/isian desain.</div>
-                </div>
-                <div className="num" style={{ fontWeight: 700, minWidth: 60, textAlign: 'right' }}>
-                  {(d.certificate?.textOffsetY ?? 0) > 0 ? `+${d.certificate?.textOffsetY} %` : `${d.certificate?.textOffsetY ?? 0} %`}
-                </div>
-              </div>
-              <div className="row" style={{ gap: 10, alignItems: 'center' }}>
-                <button
-                  type="button"
-                  className="btn sm"
-                  onClick={() => {
-                    const c = structuredClone(d.certificate ?? {});
-                    c.textOffsetY = (c.textOffsetY ?? 0) - 2;
-                    setD({ ...d, certificate: c });
-                  }}
-                  title="Naikkan 2%"
-                >
-                  ▲ Naik
-                </button>
-                <input
-                  type="range"
-                  min="-35"
-                  max="35"
-                  step="1"
-                  value={d.certificate?.textOffsetY ?? 0}
-                  onChange={(e) => {
-                    const c = structuredClone(d.certificate ?? {});
-                    c.textOffsetY = parseInt(e.target.value, 10);
-                    setD({ ...d, certificate: c });
-                  }}
-                  style={{ flex: 1, accentColor: 'var(--accent)' }}
-                />
-                <button
-                  type="button"
-                  className="btn sm"
-                  onClick={() => {
-                    const c = structuredClone(d.certificate ?? {});
-                    c.textOffsetY = (c.textOffsetY ?? 0) + 2;
-                    setD({ ...d, certificate: c });
-                  }}
-                  title="Turunkan 2%"
-                >
-                  Turun ▼
-                </button>
-                <button
-                  type="button"
-                  className="btn ghost sm"
-                  onClick={() => {
-                    const c = structuredClone(d.certificate ?? {});
-                    c.textOffsetY = 0;
-                    setD({ ...d, certificate: c });
-                  }}
-                >
-                  Pusat (0)
-                </button>
-              </div>
-            </div>
-
-            <div className="row between">
-              <div>
-                <b>Perataan Teks</b>
-                <div className="xs muted">Pilihan perataan horizontal teks nama dan predikat juara.</div>
-              </div>
-              <Seg
-                value={d.certificate?.textAlign ?? 'center'}
-                onChange={(v) => {
+              <PosControl
+                label="Nama Regu"
+                sample="Regu Garuda"
+                x={d.certificate?.nameX ?? d.certificate?.textOffsetX ?? 0}
+                y={d.certificate?.nameY ?? d.certificate?.textOffsetY ?? 0}
+                onChangeX={(n) => {
                   const c = structuredClone(d.certificate ?? {});
-                  c.textAlign = v as 'center' | 'left' | 'right';
+                  c.nameX = n;
                   setD({ ...d, certificate: c });
                 }}
-                opts={[
-                  { v: 'left', l: 'Kiri' },
-                  { v: 'center', l: 'Tengah' },
-                  { v: 'right', l: 'Kanan' },
-                ]}
+                onChangeY={(n) => {
+                  const c = structuredClone(d.certificate ?? {});
+                  c.nameY = n;
+                  setD({ ...d, certificate: c });
+                }}
+              />
+
+              <PosControl
+                label="Pangkalan / Sekolah"
+                sample="Darul Ulum Banyuanyar"
+                x={d.certificate?.pangkalanX ?? d.certificate?.textOffsetX ?? 0}
+                y={d.certificate?.pangkalanY ?? d.certificate?.textOffsetY ?? 0}
+                onChangeX={(n) => {
+                  const c = structuredClone(d.certificate ?? {});
+                  c.pangkalanX = n;
+                  setD({ ...d, certificate: c });
+                }}
+                onChangeY={(n) => {
+                  const c = structuredClone(d.certificate ?? {});
+                  c.pangkalanY = n;
+                  setD({ ...d, certificate: c });
+                }}
+              />
+
+              <PosControl
+                label="Predikat Juara"
+                sample="Juara Umum"
+                x={d.certificate?.awardX ?? d.certificate?.textOffsetX ?? 0}
+                y={d.certificate?.awardY ?? d.certificate?.textOffsetY ?? 0}
+                onChangeX={(n) => {
+                  const c = structuredClone(d.certificate ?? {});
+                  c.awardX = n;
+                  setD({ ...d, certificate: c });
+                }}
+                onChangeY={(n) => {
+                  const c = structuredClone(d.certificate ?? {});
+                  c.awardY = n;
+                  setD({ ...d, certificate: c });
+                }}
               />
             </div>
           </div>

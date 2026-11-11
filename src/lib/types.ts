@@ -26,6 +26,12 @@ export interface CertConfig {
   hideBoilerplate?: boolean;
   textOffsetX?: number;
   textOffsetY?: number;
+  nameX?: number;
+  nameY?: number;
+  pangkalanX?: number;
+  pangkalanY?: number;
+  awardX?: number;
+  awardY?: number;
   textAlign?: 'center' | 'left' | 'right';
 }
 export interface Config {
