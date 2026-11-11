@@ -70,6 +70,10 @@ export function TeamList() {
                         <span className="chip ok" style={{ fontSize: 10, padding: '2px 6px', height: 'auto' }} title="Admin mengizinkan juri mengubah nilai">
                           <Icon n="unlock" size={12} /> Buka
                         </span>
+                      ) : r.data?.locked === false || !cs!.complete ? (
+                        <span className="chip gold" style={{ fontSize: 10, padding: '2px 6px', height: 'auto' }} title="Draf nilai belum dikunci">
+                          <Icon n="pencil" size={12} /> Draf
+                        </span>
                       ) : (
                         <span className="chip" style={{ fontSize: 10, padding: '2px 6px', height: 'auto' }} title="Nilai terkunci">
                           <Icon n="lock" size={12} /> Kunci

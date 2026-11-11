@@ -38,15 +38,18 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
 
   const isAdmin = me?.role === 'admin';
   const isSaved = !!existing;
-  const isLocked = !isAdmin && isSaved && !existing?.data?.unlocked;
-  const isUnlockedByAdmin = !isAdmin && isSaved && !!existing?.data?.unlocked;
-
   const bad = (c: (typeof def.criteria)[number], i: number) => {
     const n = toNum(vals[c.id][i]); if (n == null) return false;
     return !Number.isFinite(n) || n < 0 || n > instMax(c) || (!!c.int && !Number.isInteger(n));
   };
   const empties = def.criteria.reduce((a, c) => a + vals[c.id].filter((v) => v.trim() === '').length, 0) + (def.time && !tm.trim() && !ts.trim() ? 1 : 0);
   const invalid = def.criteria.some((c) => vals[c.id].some((_, i) => bad(c, i))) || (!!def.time && (Number(tm || 0) < 0 || Number(ts || 0) > 59 || Number(ts || 0) < 0));
+  const isComplete = dq || empties === 0;
+
+  // Nilai hanya terkunci bagi juri jika sudah berstatus locked (bukan draft locked: false) dan tidak sedang dibuka oleh Admin
+  const isLocked = !isAdmin && isSaved && existing?.data?.locked !== false && !existing?.data?.unlocked;
+  const isUnlockedByAdmin = !isAdmin && isSaved && !!existing?.data?.unlocked;
+  const isDraft = !isAdmin && isSaved && existing?.data?.locked === false;
 
   const data: ScoreData = useMemo(() => ({
     c: Object.fromEntries(def.criteria.map((c) => [c.id, vals[c.id].map(toNum)])),
@@ -71,14 +74,19 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
   const executeSave = async () => {
     setBusy(true);
     try {
+      const willLock = isComplete; // Hanya dikunci jika seluruh kolom sudah terisi lengkap (empties === 0) atau DQ
       const payloadData: ScoreData = {
         ...(dq ? { c: {}, p: {} } : data),
-        locked: true,
-        unlocked: false, // otomatis kunci kembali setelah disimpan
+        locked: willLock,
+        unlocked: false,
       };
       const r = await saveScore({ team_id: teamId, contest: def.key, data: payloadData, dq, note: note.trim() });
       setConfirmOpen(false);
-      toast(r === 'queued' ? 'Disimpan di perangkat, menunggu sinyal' : isSaved ? 'Perubahan disimpan & nilai dikunci' : 'Nilai tersimpan & dikunci');
+      if (!willLock) {
+        toast(r === 'queued' ? 'Draf disimpan di perangkat (Belum dikunci)' : 'Draf tersimpan (Belum dikunci, bisa diedit lagi)');
+      } else {
+        toast(r === 'queued' ? 'Disimpan di perangkat & nilai dikunci' : isSaved ? 'Perubahan disimpan & nilai dikunci' : 'Nilai lengkap tersimpan & dikunci');
+      }
       onDone(nextTeam());
     } catch (e) { toast((e as Error).message, 'err'); } finally { setBusy(false); }
   };
@@ -163,7 +171,21 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
             <div>
               <b style={{ color: '#14532d', fontSize: 14 }}>Izin Edit Diberikan oleh Admin</b>
               <div className="xs" style={{ marginTop: 4, lineHeight: 1.45 }}>
-                Admin telah membuka kunci nilai ini. Silakan perbaiki data. Setelah menekan tombol <b>Simpan</b>, nilai akan <b>otomatis terkunci kembali</b>.
+                Admin telah membuka kunci nilai ini. Silakan perbaiki data. Setelah menekan tombol <b>Simpan</b>, nilai akan <b>otomatis terkunci kembali</b> jika seluruh kolom telah lengkap.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDraft && (
+        <div className="card pad" style={{ background: '#fefce8', border: '1px solid #eab308', color: '#854d0e', marginBottom: 14 }}>
+          <div className="row" style={{ gap: 10, alignItems: 'flex-start' }}>
+            <div style={{ marginTop: 2 }}><Icon n="pencil" size={20} /></div>
+            <div>
+              <b style={{ color: '#713f12', fontSize: 14 }}>Draf Nilai Sementara (Belum Dikunci)</b>
+              <div className="xs" style={{ marginTop: 4, lineHeight: 1.45 }}>
+                Nilai sebelumnya baru terisi sebagian sehingga belum dikunci. Anda masih bebas melengkapi kolom lainnya kapan saja. Nilai baru akan otomatis dikunci setelah seluruh kolom terisi lengkap.
               </div>
             </div>
           </div>
@@ -241,7 +263,7 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
             <div className="grow">
               <div className="xs muted">{dq ? 'Diskualifikasi' : cs.penalty ? `Dikurangi ${fmt(cs.penalty)}` : 'Nilai'}</div>
               <div className="sc2 num">{fmt(cs.score)}<span className="faint" style={{ fontSize: 15, fontFamily: 'var(--f)' }}> / {fmt(max)}</span></div>
-              {!dq && empties > 0 && <div className="xs" style={{ color: 'var(--accent)', fontWeight: 700 }}>{empties} isian kosong dihitung 0</div>}
+              {!dq && empties > 0 && <div className="xs" style={{ color: 'var(--accent)', fontWeight: 700 }}>{empties} isian belum diisi (Disimpan draf)</div>}
             </div>
             {isLocked ? (
               <button type="button" className="btn" disabled style={{ minWidth: 150, opacity: 0.8, cursor: 'not-allowed' }}>
@@ -249,8 +271,8 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
               </button>
             ) : (
               <button type="button" className="btn primary" style={{ minWidth: 150 }} disabled={busy} onClick={handlePromptSave}>
-                <Icon n="check" size={18} />
-                {busy ? 'Menyimpan…' : isUnlockedByAdmin ? 'Simpan Perubahan' : 'Simpan'}
+                <Icon n={isComplete ? "check" : "pencil"} size={18} />
+                {busy ? 'Menyimpan…' : !isComplete ? 'Simpan Draf' : isUnlockedByAdmin ? 'Simpan Perubahan' : 'Simpan & Kunci'}
               </button>
             )}
           </div>
@@ -265,16 +287,24 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
         }}>
           <div className="card pad stack" style={{ maxWidth: 440, width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
             <div className="row" style={{ gap: 10, alignItems: 'center' }}>
-              <span style={{ fontSize: 26 }}>🔒</span>
+              <span style={{ fontSize: 26 }}>{isComplete ? '🔒' : '📝'}</span>
               <div>
-                <b style={{ fontSize: 16 }}>{isSaved ? 'Konfirmasi Simpan Perubahan' : 'Konfirmasi Simpan Nilai'}</b>
+                <b style={{ fontSize: 16 }}>
+                  {!isComplete
+                    ? 'Simpan Draf Sementara'
+                    : isSaved
+                    ? 'Konfirmasi Simpan Perubahan'
+                    : 'Konfirmasi Simpan & Kunci Nilai'}
+                </b>
                 <div className="xs muted">Regu {team.name} ({team.pangkalan})</div>
               </div>
             </div>
             <p className="sm" style={{ margin: '10px 0', lineHeight: 1.5 }}>
-              {isSaved
-                ? `Perubahan nilai akan disimpan. Setelah ini, nilai akan OTOMATIS TERKUNCI KEMBALI dan Anda harus meminta izin Admin lagi jika ingin mengubahnya.`
-                : `Pastikan semua data nilai regu "${team.name}" sudah benar. Setelah disimpan, nilai ini akan LANGSUNG DIKUNCI dan Anda TIDAK BISA mengubahnya lagi kecuali diizinkan oleh Admin.`}
+              {!isComplete
+                ? `Masih ada ${empties} kolom nilai yang belum terisi. Nilai akan disimpan sebagai DRAF SEMENTARA dan TIDAK DIKUNCI, sehingga Anda bebas melengkapinya nanti kapan saja.`
+                : isSaved
+                ? `Semua nilai sudah lengkap. Setelah disimpan, nilai akan OTOMATIS TERKUNCI KEMBALI dan Anda harus meminta izin Admin lagi jika ingin mengubahnya.`
+                : `Semua kolom nilai telah terisi lengkap. Setelah disimpan, nilai ini akan LANGSUNG DIKUNCI dan Anda TIDAK BISA mengubahnya lagi kecuali diizinkan oleh Admin.`}
             </p>
             <div className="row wrap between" style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--line)', gap: 8 }}>
               <button type="button" className="btn" onClick={() => { setConfirmOpen(false); nav(); }} disabled={busy}>
@@ -285,7 +315,7 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
                   Cek Lagi
                 </button>
                 <button type="button" className="btn primary" onClick={executeSave} disabled={busy}>
-                  {busy ? 'Menyimpan…' : 'Oke, Simpan'}
+                  {busy ? 'Menyimpan…' : !isComplete ? 'Simpan Draf' : 'Oke, Simpan & Kunci'}
                 </button>
               </div>
             </div>
