@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Icon, Mark } from '../components/ui';
+import { DevFooter } from '../components/DevFooter';
 import { useApp } from '../lib/store';
 
 export default function Login() {
@@ -34,6 +35,7 @@ export default function Login() {
           {demo && <div className="xs muted" style={{ textAlign: 'center' }}>Mode demo · coba <b>admin / admin</b> atau <b>juri / juri</b></div>}
         </div>
       </form>
+      <DevFooter style={{ maxWidth: 400, marginTop: 18, width: '100%' }} />
     </div>
   );
 }

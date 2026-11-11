@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Icon } from '../components/ui';
+import { DevFooter } from '../components/DevFooter';
 import { useApp } from '../lib/store';
 
 export default function Menu() {
@@ -16,6 +17,7 @@ export default function Menu() {
         <button className="btn block" onClick={() => reload()}><Icon n="refresh" size={18} />Muat ulang data</button>
         <button className="btn danger block" onClick={signOut}><Icon n="logout" size={18} />Keluar</button>
         {demo && <p className="xs faint" style={{ textAlign: 'center' }}>Mode demo aktif.</p>}
+        <DevFooter />
       </div>
     </div>
   );

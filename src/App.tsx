@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { Icon, Mark } from './components/ui';
+import { DevFooter } from './components/DevFooter';
 import { useApp } from './lib/store';
 import Login from './pages/Login';
 import Public from './pages/Public';
@@ -44,6 +45,7 @@ function Shell() {
           <div style={{ fontWeight: 700, color: '#fff' }} className="trunc">{me.name}</div>
           <div className="xs" style={{ opacity: .65, marginBottom: 10 }}>{admin ? 'Admin' : 'Juri'}</div>
           <button className="btn sm block" style={{ background: 'transparent', color: '#eadfca', borderColor: 'rgba(255,255,255,.25)' }} onClick={signOut}><Icon n="logout" size={17} />Keluar</button>
+          <DevFooter variant="sidebar" />
         </div>
       </aside>
       <div className="main">

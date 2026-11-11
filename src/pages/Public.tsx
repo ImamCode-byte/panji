@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Empty, fmt, Icon, Mark, Rank, Seg } from '../components/ui';
 import { RankTable } from '../components/RankTable';
+import { DevFooter } from '../components/DevFooter';
 import { api } from '../lib/data';
 import type { Snapshot } from '../lib/snapshot';
 import { useApp } from '../lib/store';
@@ -65,6 +66,7 @@ export default function Public() {
             {tab === 'f' && (s.favorit.length ? <div className="list">{s.favorit.map((f) => <div key={f.pangkalan} className="li" style={{ cursor: 'default' }}><Rank n={f.rank} /><div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{f.pangkalan}</div><div className="xs muted trunc">{f.names.join(' · ')}</div></div><b className="num">{fmt(f.total)}</b></div>)}</div> : <Empty>Belum ada pangkalan dengan dua regu yang dinilai.</Empty>)}
           </div>
         )}
+        <DevFooter />
       </main>
     </>
   );
