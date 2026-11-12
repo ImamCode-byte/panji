@@ -1,6 +1,6 @@
 export type Role = 'admin' | 'juri';
 export interface Profile { id: string; username: string; name: string; role: Role; contests: string[] }
-export interface Team { id: string; no: number; name: string; pangkalan: string; gudep: string; dq: boolean; tie_order: number | null }
+export interface Team { id: string; no: number; name: string; pangkalan: string; gudep: string; alamat?: string; dq: boolean; tie_order: number | null }
 
 export interface Criterion {
   id: string; label: string; max: number;

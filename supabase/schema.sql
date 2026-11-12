@@ -15,10 +15,13 @@ create table if not exists public.teams (
   name text not null,
   pangkalan text not null default '',
   gudep text not null default '',
+  alamat text not null default '',
   dq boolean not null default false,
   tie_order int,
   created_at timestamptz not null default now()
 );
+-- Migrasi jika tabel teams sudah ada sebelumnya:
+alter table if exists public.teams add column if not exists alamat text not null default '';
 create table if not exists public.scores (
   team_id uuid not null references public.teams(id) on delete cascade,
   contest text not null,

@@ -125,7 +125,7 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
       <button className="btn ghost sm" style={{ marginLeft: -10, marginBottom: 6 }} onClick={nav}><Icon n="back" size={18} />{def.name}</button>
       <div className="card pad row" style={{ marginBottom: 14 }}>
         <span className="noBadge" style={{ width: 48, height: 48, fontSize: 18, borderRadius: 12 }}>{String(team.no).padStart(2, '0')}</span>
-        <div className="grow"><div className="disp" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1.15 }}>{team.name}</div><div className="xs muted trunc">{team.pangkalan}</div></div>
+        <div className="grow"><div className="disp" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1.15 }}>{team.name}</div><div className="xs muted trunc">{team.pangkalan}{team.alamat ? ` · ${team.alamat}` : ''}</div></div>
       </div>
 
       <div className="row between wrap" style={{ gap: 8, alignItems: 'center', marginBottom: 12 }}>
@@ -296,7 +296,7 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
                     ? 'Konfirmasi Simpan Perubahan'
                     : 'Konfirmasi Simpan & Kunci Nilai'}
                 </b>
-                <div className="xs muted">Regu {team.name} ({team.pangkalan})</div>
+                <div className="xs muted">Regu {team.name} ({team.pangkalan}{team.alamat ? ` · ${team.alamat}` : ''})</div>
               </div>
             </div>
             <p className="sm" style={{ margin: '10px 0', lineHeight: 1.5 }}>

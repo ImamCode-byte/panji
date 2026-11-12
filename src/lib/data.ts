@@ -93,14 +93,25 @@ export const api = {
       else d.teams.push({ ...t, id: `demo-${Date.now()}-${t.no}` } as Team);
       d.teams.sort((a, b) => a.no - b.no); dsave(d); return;
     }
-    const row = { no: t.no, name: t.name, pangkalan: t.pangkalan, gudep: t.gudep, dq: t.dq, tie_order: t.tie_order };
-    const { error } = t.id ? await sb!.from('teams').update(row).eq('id', t.id) : await sb!.from('teams').insert(row);
-    if (error?.code === '23505') throw new Error(`Nomor ${t.no} sudah dipakai.`);
-    wrap(error);
+    const row: Record<string, unknown> = { no: t.no, name: t.name, pangkalan: t.pangkalan, gudep: t.gudep, dq: t.dq, tie_order: t.tie_order };
+    if (t.alamat !== undefined) row.alamat = t.alamat;
+    let res = t.id ? await sb!.from('teams').update(row).eq('id', t.id) : await sb!.from('teams').insert(row);
+    if (res.error && (res.error.message?.includes('alamat') || res.error.code === 'PGRST204')) {
+      delete row.alamat;
+      res = t.id ? await sb!.from('teams').update(row).eq('id', t.id) : await sb!.from('teams').insert(row);
+    }
+    if (res.error?.code === '23505') throw new Error(`Nomor ${t.no} sudah dipakai.`);
+    wrap(res.error);
   },
-  async importTeams(rows: { no: number; name: string; pangkalan: string; gudep: string }[]) {
+  async importTeams(rows: { no: number; name: string; pangkalan: string; gudep: string; alamat?: string }[]) {
     if (DEMO) { for (const r of rows) { const d = dload(); const ex = d.teams.find((x) => x.no === r.no); await api.saveTeam({ ...r, dq: ex?.dq ?? false, tie_order: ex?.tie_order ?? null, id: ex?.id }); } return; }
-    const { error } = await sb!.from('teams').upsert(rows, { onConflict: 'no' }); wrap(error);
+    let { error } = await sb!.from('teams').upsert(rows, { onConflict: 'no' });
+    if (error && (error.message?.includes('alamat') || error.code === 'PGRST204')) {
+      const noAlamat = rows.map(({ alamat, ...rest }) => rest);
+      const retry = await sb!.from('teams').upsert(noAlamat, { onConflict: 'no' });
+      error = retry.error;
+    }
+    wrap(error);
   },
   async deleteTeam(id: string) {
     if (DEMO) { const d = dload(); d.teams = d.teams.filter((x) => x.id !== id); d.scores = d.scores.filter((x) => x.team_id !== id); dsave(d); return; }

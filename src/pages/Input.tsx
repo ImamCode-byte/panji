@@ -39,7 +39,7 @@ export function TeamList() {
   const isStage = key === 'msc_semifinal' || key === 'msc_final';
   const recs = new Map(scores.filter((s) => s.contest === key).map((s) => [s.team_id, s]));
   const rankMap = new Map((st.per[key] ?? []).map((r) => [r.teamId, r.rank]));
-  const rows = eligible(key, teams, st, cfg, only).filter((t) => `${t.name} ${t.pangkalan} ${t.no}`.toLowerCase().includes(q.toLowerCase()))
+  const rows = eligible(key, teams, st, cfg, only).filter((t) => `${t.name} ${t.pangkalan} ${t.no} ${t.alamat ?? ''}`.toLowerCase().includes(q.toLowerCase()))
     .filter((t) => (f === 'all' ? true : f === 'done' ? recs.has(t.id) : !recs.has(t.id)));
   const { done, total } = contestProgress(key, teams, scores, st, cfg);
   return (
@@ -50,7 +50,7 @@ export function TeamList() {
         <div style={{ minWidth: 150 }}><div className="xs muted num" style={{ textAlign: 'right', marginBottom: 4 }}>{done} dari {total} dinilai</div><Progress v={total ? done / total : 0} ok={done >= total && total > 0} /></div>
       </div>
       <div className="stack">
-        <div className="search"><Icon n="search" size={18} /><input className="input" placeholder="Cari nomor, regu, pangkalan" value={q} onChange={(e) => setQ(e.target.value)} inputMode="search" /></div>
+        <div className="search"><Icon n="search" size={18} /><input className="input" placeholder="Cari nomor, regu, pangkalan, alamat" value={q} onChange={(e) => setQ(e.target.value)} inputMode="search" /></div>
         <div className="row wrap between">
           <Seg value={f} onChange={setF} opts={[{ v: 'all', l: 'Semua' }, { v: 'todo', l: 'Belum' }, { v: 'done', l: 'Sudah' }]} />
           {isStage && <label className="row sm" style={{ gap: 8 }}>Hanya yang lolos<button type="button" role="switch" aria-checked={only} className={`switch ${only ? 'on' : ''}`} onClick={() => setOnly(!only)} /></label>}
@@ -62,7 +62,7 @@ export function TeamList() {
             return (
               <Link key={t.id} to={`/app/input/${key}/${t.id}`} className="li">
                 <span className="noBadge">{String(t.no).padStart(2, '0')}</span>
-                <div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{t.name}</div><div className="trunc xs muted">{t.pangkalan}</div></div>
+                <div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{t.name}</div><div className="trunc xs muted">{t.pangkalan}{t.alamat ? ` · ${t.alamat}` : ''}</div></div>
                 {!r ? <span className="chip">Belum</span> : cs!.dq ? <span className="chip bad">Diskualifikasi</span> : (
                   <div style={{ textAlign: 'right' }}>
                     <div className="row" style={{ gap: 6, justifyContent: 'flex-end', alignItems: 'center' }}>
