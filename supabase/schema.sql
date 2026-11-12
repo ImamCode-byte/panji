@@ -42,6 +42,23 @@ create table if not exists public.score_log (
   id bigserial primary key, at timestamptz not null default now(),
   who uuid, team_id uuid, contest text, action text, old jsonb, new jsonb
 );
+create table if not exists public.login_logs (
+  id bigserial primary key,
+  user_id uuid references auth.users(id) on delete set null,
+  username text not null default '',
+  name text not null default '',
+  email text not null default '',
+  role text not null default '',
+  ip text not null default '',
+  city text not null default '',
+  region text not null default '',
+  country text not null default '',
+  latitude double precision,
+  longitude double precision,
+  maps_url text not null default '',
+  device text not null default '',
+  at timestamptz not null default now()
+);
 
 -- helper peran
 create or replace function public.is_admin() returns boolean
@@ -128,6 +145,12 @@ create policy p_snap_write on public.snapshot for all to authenticated using (pu
 
 drop policy if exists p_log_read on public.score_log;
 create policy p_log_read on public.score_log for select to authenticated using (public.is_admin());
+
+alter table public.login_logs enable row level security;
+drop policy if exists p_login_logs_read on public.login_logs;
+drop policy if exists p_login_logs_ins on public.login_logs;
+create policy p_login_logs_read on public.login_logs for select to authenticated using (public.is_admin());
+create policy p_login_logs_ins on public.login_logs for insert to authenticated with check (true);
 
 -- realtime
 do $$ begin

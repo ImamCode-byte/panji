@@ -1,7 +1,7 @@
 import { DEMO, EMAIL_DOMAIN, sb } from './supabase';
 import { DEFAULT_CONFIG, mergeConfig } from './contests';
 import { demoScores, demoTeams } from './seed';
-import type { AuditRow, Config, Profile, ScoreRec, Team } from './types';
+import type { AuditRow, Config, LoginLog, Profile, ScoreRec, Team } from './types';
 import type { Snapshot } from './snapshot';
 
 export interface Loaded { teams: Team[]; scores: ScoreRec[]; config: Config; profiles: Profile[] }
@@ -15,14 +15,14 @@ const wrap = (e: { message: string; code?: string } | null) => {
 
 /* ---------- demo (localStorage) ---------- */
 const LS = 'panji.demo.v2';
-interface Demo { teams: Team[]; scores: ScoreRec[]; config: Config; users: (Profile & { password: string })[]; snapshot: Snapshot | null; audit: AuditRow[]; me: string | null }
+interface Demo { teams: Team[]; scores: ScoreRec[]; config: Config; users: (Profile & { password: string })[]; snapshot: Snapshot | null; audit: AuditRow[]; login_logs?: LoginLog[]; me: string | null }
 function dload(): Demo {
   try { const x = localStorage.getItem(LS); if (x) return JSON.parse(x); } catch { /* ignore */ }
   const d: Demo = {
-    teams: demoTeams(), scores: [], config: structuredClone(DEFAULT_CONFIG), snapshot: null, audit: [], me: null,
+    teams: demoTeams(), scores: [], config: structuredClone(DEFAULT_CONFIG), snapshot: null, audit: [], login_logs: [], me: null,
     users: [
-      { id: 'u-admin', username: 'admin', name: 'Admin Panitia', role: 'admin', contests: [], password: 'admin' },
-      { id: 'u-juri', username: 'juri', name: 'Juri Contoh', role: 'juri', contests: [], password: 'juri' },
+      { id: 'u-admin', username: 'admin', name: 'Admin Developer', role: 'admin', contests: [], password: 'admin', email: 'imamdhespachito001@gmail.com' },
+      { id: 'u-juri', username: 'juri', name: 'Juri Contoh', role: 'juri', contests: [], password: 'juri', email: 'juri@panji.internal' },
     ],
   };
   dsave(d); return d;
@@ -31,11 +31,116 @@ const dsave = (d: Demo) => localStorage.setItem(LS, JSON.stringify(d));
 const strip = ({ password: _p, ...p }: Demo['users'][number]): Profile => p;
 let audit = 0;
 
+function parseDevice(): string {
+  if (typeof navigator === 'undefined') return 'Tidak diketahui';
+  const ua = navigator.userAgent;
+  let os = 'Perangkat Lain';
+  if (/android/i.test(ua)) os = 'Android';
+  else if (/iphone|ipad|ipod/i.test(ua)) os = 'iOS';
+  else if (/windows/i.test(ua)) os = 'Windows';
+  else if (/macintosh|mac os x/i.test(ua)) os = 'macOS';
+  else if (/linux/i.test(ua)) os = 'Linux';
+
+  let browser = 'Browser';
+  if (/chrome|crios/i.test(ua) && !/edge|edg|opr/i.test(ua)) browser = 'Chrome';
+  else if (/firefox|fxios/i.test(ua)) browser = 'Firefox';
+  else if (/safari/i.test(ua) && !/chrome|crios/i.test(ua)) browser = 'Safari';
+  else if (/edg/i.test(ua)) browser = 'Edge';
+  else if (/opr|opera/i.test(ua)) browser = 'Opera';
+
+  return `${os} · ${browser}`;
+}
+
+async function fetchGeoLocation(): Promise<{ ip: string; city: string; region: string; country: string; latitude: number | null; longitude: number | null; maps_url: string }> {
+  const fallback = { ip: '', city: 'Tidak diketahui', region: '', country: 'Indonesia', latitude: null as number | null, longitude: null as number | null, maps_url: '' };
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch('https://ipwho.is/', { signal: controller.signal }).catch(() => null);
+    clearTimeout(timer);
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data && data.success !== false) {
+        const lat = typeof data.latitude === 'number' ? data.latitude : null;
+        const lon = typeof data.longitude === 'number' ? data.longitude : null;
+        const maps_url = lat != null && lon != null
+          ? `https://www.google.com/maps?q=${lat},${lon}`
+          : data.city ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${data.city}, ${data.region || ''}`)}` : '';
+        return { ip: data.ip || '', city: data.city || 'Tidak diketahui', region: data.region || '', country: data.country || 'Indonesia', latitude: lat, longitude: lon, maps_url };
+      }
+    }
+  } catch { /* ignore */ }
+  return fallback;
+}
+
+async function recordLogin(user: { id?: string; username: string; name: string; role: string; email?: string }) {
+  try {
+    const geo = await fetchGeoLocation();
+    const device = parseDevice();
+    const email = user.email || (user.username.includes('@') ? user.username : `${user.username}@panji.internal`);
+    const logItem: LoginLog = {
+      id: DEMO ? `log-${Date.now()}` : 0,
+      user_id: user.id,
+      username: user.username,
+      name: user.name,
+      email,
+      role: user.role,
+      ip: geo.ip,
+      city: geo.city,
+      region: geo.region,
+      country: geo.country,
+      latitude: geo.latitude,
+      longitude: geo.longitude,
+      maps_url: geo.maps_url,
+      device,
+      at: new Date().toISOString(),
+    };
+
+    if (DEMO) {
+      const d = dload();
+      if (!d.login_logs) d.login_logs = [];
+      d.login_logs.unshift(logItem);
+      d.login_logs = d.login_logs.slice(0, 200);
+      dsave(d);
+      return;
+    }
+
+    if (sb) {
+      await sb.from('login_logs').insert({
+        user_id: user.id || null,
+        username: user.username,
+        name: user.name,
+        email,
+        role: user.role,
+        ip: geo.ip,
+        city: geo.city,
+        region: geo.region,
+        country: geo.country,
+        latitude: geo.latitude,
+        longitude: geo.longitude,
+        maps_url: geo.maps_url,
+        device,
+      });
+    }
+  } catch (e) {
+    console.warn('Gagal mencatat login_logs:', e);
+  }
+}
+
 export const api = {
   async session(): Promise<Profile | null> {
-    if (DEMO) { const d = dload(); const u = d.users.find((x) => x.id === d.me); return u ? strip(u) : null; }
+    if (DEMO) {
+      const d = dload(); const u = d.users.find((x) => x.id === d.me);
+      if (!u) return null;
+      const prof = strip(u);
+      if (prof.username === 'admin') prof.email = 'imamdhespachito001@gmail.com';
+      return prof;
+    }
     const { data } = await sb!.auth.getSession();
-    return data.session ? api.profile(data.session.user.id) : null;
+    if (!data.session) return null;
+    const p = await api.profile(data.session.user.id);
+    if (p && data.session.user.email) p.email = data.session.user.email;
+    return p;
   },
   async profile(id: string): Promise<Profile | null> {
     const { data } = await sb!.from('profiles').select('*').eq('id', id).maybeSingle();
@@ -46,12 +151,18 @@ export const api = {
       const d = dload();
       const u = d.users.find((x) => x.username === username.trim().toLowerCase() && x.password === password);
       if (!u) throw new Error('Username atau kata sandi salah.');
-      d.me = u.id; dsave(d); return strip(u);
+      d.me = u.id; dsave(d);
+      const prof = strip(u);
+      if (prof.username === 'admin') prof.email = 'imamdhespachito001@gmail.com';
+      recordLogin(prof).catch(() => {});
+      return prof;
     }
     const { data, error } = await sb!.auth.signInWithPassword({ email: toEmail(username), password });
     if (error) throw new Error(/invalid/i.test(error.message) ? 'Username atau kata sandi salah.' : error.message);
     const p = await api.profile(data.user.id);
     if (!p) throw new Error('Profil akun tidak ditemukan.');
+    if (data.user.email) p.email = data.user.email;
+    recordLogin(p).catch(() => {});
     return p;
   },
   async signOut() { if (DEMO) { const d = dload(); d.me = null; dsave(d); } else await sb!.auth.signOut(); },
@@ -149,6 +260,38 @@ export const api = {
       id: x.id, at: x.at, who: pm.get(x.who) ?? '—', team: tm.get(x.team_id) ?? '—', contest: x.contest, action: x.action,
       detail: x.new?.dq ? 'Diskualifikasi' : '',
     }));
+  },
+
+  async loginLogs(): Promise<LoginLog[]> {
+    if (DEMO) {
+      const d = dload();
+      return (d.login_logs && d.login_logs.length > 0)
+        ? d.login_logs
+        : [
+            {
+              id: 'demo-sample-1',
+              username: 'admin',
+              name: 'Admin Developer',
+              email: 'imamdhespachito001@gmail.com',
+              role: 'admin',
+              ip: '180.252.164.21',
+              city: 'Pamekasan',
+              region: 'Jawa Timur',
+              country: 'Indonesia',
+              latitude: -7.1611,
+              longitude: 113.4831,
+              maps_url: 'https://www.google.com/maps?q=-7.1611,113.4831',
+              device: 'Android · Chrome',
+              at: new Date().toISOString(),
+            },
+          ];
+    }
+    const { data, error } = await sb!.from('login_logs').select('*').order('id', { ascending: false }).limit(200);
+    if (error) {
+      if (error.code === '42P01' || error.message?.includes('does not exist')) return [];
+      wrap(error);
+    }
+    return (data as LoginLog[]) ?? [];
   },
 
   /* ---------- akun ---------- */

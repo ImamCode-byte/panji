@@ -1,5 +1,5 @@
 export type Role = 'admin' | 'juri';
-export interface Profile { id: string; username: string; name: string; role: Role; contests: string[] }
+export interface Profile { id: string; username: string; name: string; role: Role; contests: string[]; email?: string }
 export interface Team { id: string; no: number; name: string; pangkalan: string; gudep: string; alamat?: string; dq: boolean; tie_order: number | null }
 
 export interface Criterion {
@@ -57,3 +57,20 @@ export interface ScoreRec {
   updated_by?: string | null; updated_at?: string; by_name?: string;
 }
 export interface AuditRow { id: number; at: string; who: string; team: string; contest: string; action: string; detail: string }
+export interface LoginLog {
+  id: number | string;
+  user_id?: string;
+  username: string;
+  name: string;
+  email: string;
+  role: string;
+  ip: string;
+  city: string;
+  region: string;
+  country: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  maps_url: string;
+  device: string;
+  at: string;
+}
