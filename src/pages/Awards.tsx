@@ -8,6 +8,7 @@ export default function Awards() {
   const { st, cfg, teams } = useApp();
   const [tab, setTab] = useState<'k' | 'l' | 'f'>('k');
   const groups = useMemo(() => { const m = new Map<string, typeof st.awards>(); st.awards.forEach((a) => m.set(a.group, [...(m.get(a.group) ?? []), a])); return [...m]; }, [st]);
+  const unranked = useMemo(() => st.rows.filter((r) => !r.out && r.done === 0), [st]);
   const lomba = useMemo(() => buildCerts('lomba', st, cfg, teams), [st, cfg, teams]);
   const byCon = useMemo(() => { const m = new Map<string, typeof lomba>(); lomba.forEach((c) => { const k = c.label.replace(/^Juara [IVX]+ (Lomba )?/, ''); m.set(k, [...(m.get(k) ?? []), c]); }); return [...m]; }, [lomba]);
   const print = (set: CertSet, team?: string) => `/app/cetak?set=${set}${team ? `&team=${team}` : ''}`;
@@ -21,11 +22,51 @@ export default function Awards() {
         <div className="row between wrap"><Seg value={tab} onChange={setTab} opts={[{ v: 'k', l: 'Kategori umum' }, { v: 'l', l: 'Per lomba' }, { v: 'f', l: 'Pangkalan favorit' }]} />
           <Link className="btn sm" to={print(tab === 'k' ? 'awards' : tab === 'l' ? 'lomba' : 'favorit')}><Icon n="print" size={17} />Cetak tab ini</Link></div>
         {!st.complete && <div className="card pad sm" style={{ background: 'var(--accent2)', borderColor: '#e6cf9d' }}>Nilai belum lengkap. Kategori ini masih sementara dan bisa berubah.</div>}
-        {tab === 'k' && (groups.length ? <div className="grid g2" style={{ alignItems: 'start' }}>{groups.map(([g, items]) => (
-          <div key={g} className="card"><div className="sec-t" style={{ borderRadius: '14px 14px 0 0' }}>{g}</div>
-            {items.map((a) => <div key={a.label} className="li" style={{ cursor: 'default' }}><Rank n={a.rank} /><div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{a.team.name}</div><div className="xs muted trunc">{a.team.pangkalan} · {fmt(a.total)}</div></div>
-              <Link className="btn ghost icon sm" to={print('awards', a.team.id)} aria-label="Cetak"><Icon n="print" size={17} /></Link></div>)}
-          </div>))}</div> : <Empty>Belum ada nilai.</Empty>)}
+        {tab === 'k' && (
+          <>
+            {groups.length > 0 && (
+              <div className="grid g2" style={{ alignItems: 'start', marginBottom: unranked.length ? 16 : 0 }}>
+                {groups.map(([g, items]) => (
+                  <div key={g} className="card">
+                    <div className="sec-t" style={{ borderRadius: '14px 14px 0 0' }}>{g}</div>
+                    {items.map((a) => (
+                      <div key={a.label} className="li" style={{ cursor: 'default' }}>
+                        <Rank n={a.rank} />
+                        <div className="grow">
+                          <div className="trunc" style={{ fontWeight: 700 }}>{a.team.name}</div>
+                          <div className="xs muted trunc">{a.team.pangkalan} · {fmt(a.total)}</div>
+                        </div>
+                        <Link className="btn ghost icon sm" to={print('awards', a.team.id)} aria-label="Cetak"><Icon n="print" size={17} /></Link>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {unranked.length > 0 && (
+              <div className="card" style={{ border: '1px dashed var(--line2)' }}>
+                <div className="sec-t" style={{ borderRadius: '14px 14px 0 0', background: '#ece3cf', color: 'var(--ink)' }}>
+                  Belum Mendapatkan Nilai ({unranked.length} regu)
+                </div>
+                <div style={{ maxHeight: 360, overflowY: 'auto' }}>
+                  {unranked.map((r) => (
+                    <div key={r.team.id} className="li" style={{ cursor: 'default' }}>
+                      <span className="noBadge" style={{ minWidth: 32, height: 26, fontSize: 12 }}>{String(r.team.no).padStart(2, '0')}</span>
+                      <div className="grow">
+                        <div className="trunc" style={{ fontWeight: 700 }}>{r.team.name}</div>
+                        <div className="xs muted trunc">{r.team.pangkalan}{r.team.alamat ? ` · ${r.team.alamat}` : ''}</div>
+                      </div>
+                      <span className="chip" style={{ fontSize: 11, background: '#f5efe3' }}>Belum dinilai</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {!groups.length && !unranked.length && <Empty>Belum ada regu.</Empty>}
+          </>
+        )}
         {tab === 'l' && (byCon.length ? <div className="grid g3" style={{ alignItems: 'start' }}>{byCon.map(([k, items]) => (
           <div key={k} className="card"><div className="sec-t" style={{ borderRadius: '14px 14px 0 0' }}>{k}</div>
             {items.map((c, i) => <div key={i} className="li" style={{ cursor: 'default' }}><div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{c.name}</div><div className="xs muted trunc">{c.label.match(/^Juara [IVX]+/)?.[0] ?? c.label} · {c.pangkalan}</div></div></div>)}

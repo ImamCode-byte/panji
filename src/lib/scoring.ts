@@ -173,6 +173,7 @@ export function computeStandings(teams: Team[], scores: ScoreRec[], cfg: Config)
   const cnt = (r: Row, n: number) => Object.values(r.ranks).filter((x) => x === n).length;
   const cmpRow = (a: Row, b: Row) =>
     a.out !== b.out ? (a.out ? 1 : -1) :
+    (a.done > 0 !== b.done > 0 ? (a.done > 0 ? -1 : 1) : 0) ||
     b.total - a.total || cnt(b, 1) - cnt(a, 1) || cnt(b, 2) - cnt(a, 2) || cnt(b, 3) - cnt(a, 3) ||
     (a.team.tie_order ?? 1e9) - (b.team.tie_order ?? 1e9);
   rows.sort((a, b) => cmpRow(a, b) || a.team.no - b.team.no);
@@ -181,12 +182,12 @@ export function computeStandings(teams: Team[], scores: ScoreRec[], cfg: Config)
     r.rank = r.out ? 0 : same ? rows[i - 1].rank : i + 1;
     if (same) { rows[i - 1].tie = true; r.tie = true; }
   });
-  rows.forEach((r) => { r.award = r.rank ? awardLabel(r.rank, cfg.awards) : null; });
+  rows.forEach((r) => { r.award = (r.rank && r.done > 0) ? awardLabel(r.rank, cfg.awards) : null; });
 
   // Pangkalan favorit: gabungan nilai 2 regu terbaik dari satu pangkalan
   const groups = new Map<string, Row[]>();
   for (const r of rows) {
-    if (r.out) continue;
+    if (r.out || r.done === 0) continue;
     const k = r.team.pangkalan.trim().toLowerCase();
     if (k) groups.set(k, [...(groups.get(k) ?? []), r]);
   }
@@ -199,7 +200,7 @@ export function computeStandings(teams: Team[], scores: ScoreRec[], cfg: Config)
   const awards: Standings['awards'] = [];
   for (const g of cfg.awards) for (let k = 0; k < g.size; k++) {
     const rank = g.start + k;
-    for (const r of rows) if (r.rank === rank) awards.push({ group: g.name, label: g.size === 1 ? g.name : `${g.name} ${roman(k + 1)}`, rank, team: r.team, total: r.total });
+    for (const r of rows) if (r.rank === rank && r.done > 0) awards.push({ group: g.name, label: g.size === 1 ? g.name : `${g.name} ${roman(k + 1)}`, rank, team: r.team, total: r.total });
   }
   const complete = rows.length > 0 && rows.filter((r) => !r.out).every((r) => r.done === recap.length);
   return { rows, recap, of: recap.length, per, favorit: fav, awards, complete };
