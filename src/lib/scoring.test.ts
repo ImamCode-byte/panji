@@ -29,10 +29,13 @@ describe('perhitungan nilai', () => {
     const r = rec(1, 'tari', { c: { wiraga: [55], wirama: [40], wirasa: [30], wirupa: [25] } });
     expect(contestScore(def('tari'), r).score).toBe(200);
   });
-  it('pengurangan per menit dan tidak negatif', () => {
+  it('pengurangan nilai penalti dapat menghasilkan nilai minus jika melebihi nilai perolehan', () => {
     const d = { c: { kreatif: [60], kompak: [30], aksesoris: [10] }, p: { waktu: 2, kata: 1 } };
     expect(contestScore(def('yel'), rec(1, 'yel', d)).score).toBe(80);
-    expect(contestScore(def('yel'), rec(1, 'yel', { c: { kreatif: [5], kompak: [0], aksesoris: [0] }, p: { gaduh: 3 } })).score).toBe(0);
+    // Nilai dasar 5, kena penalti gaduh 3 kali (3 x 10 = 30) -> 5 - 30 = -25
+    expect(contestScore(def('yel'), rec(1, 'yel', { c: { kreatif: [5], kompak: [0], aksesoris: [0] }, p: { gaduh: 3 } })).score).toBe(-25);
+    // Contoh kasus LKBB: nilai perolehan 70, pelanggaran pengurangan 80 (8 x danton tidak menyebutkan aba-aba @ 10 poin) -> 70 - 80 = -10
+    expect(contestScore(def('lkbb'), rec(1, 'lkbb', { c: { kebenaran: [70], variasi: [0], kompak: [0] }, p: { aba: 8 } })).score).toBe(-10);
   });
   it('diskualifikasi bernilai 0', () => {
     expect(contestScore(def('yel'), rec(1, 'yel', { c: { kreatif: [60] } }, true)).score).toBe(0);
@@ -81,6 +84,25 @@ describe('klasemen umum & kategori juara', () => {
     const mk = (n: number, v: number) => rec(n, 'menaksir', { c: { tepat: [v], rapi: [0] } });
     const st = computeStandings(t, [mk(1, 30), mk(2, 50), mk(3, 40)], DEFAULT_CONFIG);
     expect(st.rows.map((r) => [r.team.no, r.rank, r.award])).toEqual([[2, 1, 'Juara Umum'], [3, 2, 'Juara Utama I'], [1, 3, 'Juara Utama II']]);
+  });
+  it('nilai negatif dari penalti mengurangi akumulasi total nilai klasemen', () => {
+    const t = [team(1), team(2)];
+    const s = [
+      // Regu 1: Yel dapat 100, LKBB nilai dasar 70 kena penalti 80 = -10 -> total seharusnya 100 + (-10) = 90
+      rec(1, 'yel', { c: { kreatif: [60], kompak: [30], aksesoris: [10] } }),
+      rec(1, 'lkbb', { c: { kebenaran: [70], variasi: [0], kompak: [0] }, p: { aba: 8 } }),
+      // Regu 2: Yel dapat 95
+      rec(2, 'yel', { c: { kreatif: [55], kompak: [30], aksesoris: [10] } }),
+    ];
+    const st = computeStandings(t, s, DEFAULT_CONFIG);
+    const r1 = st.rows.find((r) => r.team.no === 1);
+    const r2 = st.rows.find((r) => r.team.no === 2);
+    expect(r1?.scores.lkbb).toBe(-10);
+    expect(r1?.total).toBe(90);
+    expect(r2?.total).toBe(95);
+    // Regu 2 (total 95) berperingkat di atas Regu 1 (total 90)
+    expect(st.rows[0].team.no).toBe(2);
+    expect(st.rows[1].team.no).toBe(1);
   });
   it('lomba non rotasi (Danton, Tergiat) tidak masuk total', () => {
     const t = [team(1)];

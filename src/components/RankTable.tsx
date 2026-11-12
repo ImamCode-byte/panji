@@ -40,8 +40,20 @@ export function RankTable({ lines, recap, provisional }: { lines: Line[]; recap:
                 <td className="c stk-2"><span className="noBadge" style={{ minWidth: 32, height: 26, fontSize: 12 }}>{String(l.no).padStart(2, '0')}</span></td>
                 <td className="l stk-3"><b>{l.name}</b></td>
                 <td className="l muted">{l.pangkalan}</td>
-                {recap.map((r) => <td key={r.key} className={l.s[r.key] == null ? 'faint' : ''}>{l.s[r.key] == null ? '·' : fmt(l.s[r.key])}</td>)}
-                <td className="tot">{fmt(l.total)}</td>
+                {recap.map((r) => {
+                  const val = l.s[r.key];
+                  const isNeg = val != null && val < 0;
+                  return (
+                    <td
+                      key={r.key}
+                      className={val == null ? 'faint' : ''}
+                      style={isNeg ? { color: 'var(--bad)', fontWeight: 700 } : undefined}
+                    >
+                      {val == null ? '·' : fmt(val)}
+                    </td>
+                  );
+                })}
+                <td className="tot" style={l.total < 0 ? { color: 'var(--bad)' } : undefined}>{fmt(l.total)}</td>
                 <td className="l">{award(l)}</td>
               </tr>
             ))}
@@ -54,12 +66,26 @@ export function RankTable({ lines, recap, provisional }: { lines: Line[]; recap:
             <div className="row">
               <Rank n={l.rank} tie={l.tie} />
               <div className="grow"><div className="trunc" style={{ fontWeight: 700 }}><span className="faint">#{String(l.no).padStart(2, '0')}</span> {l.name}</div><div className="trunc xs muted">{l.pangkalan}</div></div>
-              <div style={{ textAlign: 'right' }}><div className="disp num" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1 }}>{fmt(l.total)}</div>{l.done < recap.length && <div className="xs faint">{l.done}/{recap.length} lomba</div>}</div>
+              <div style={{ textAlign: 'right' }}><div className="disp num" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1, ...(l.total < 0 ? { color: 'var(--bad)' } : {}) }}>{fmt(l.total)}</div>{l.done < recap.length && <div className="xs faint">{l.done}/{recap.length} lomba</div>}</div>
             </div>
             {(l.award || l.out) && <div style={{ marginTop: 8 }}>{award(l)}</div>}
             {open === l.no && (
               <div className="bd num">
-                {recap.map((r) => <div key={r.key} style={{ display: 'contents' }}><span className="muted">{r.name}</span><b style={{ textAlign: 'right' }} className={l.s[r.key] == null ? 'faint' : ''}>{l.s[r.key] == null ? '—' : fmt(l.s[r.key])}</b></div>)}
+                {recap.map((r) => {
+                  const val = l.s[r.key];
+                  const isNeg = val != null && val < 0;
+                  return (
+                    <div key={r.key} style={{ display: 'contents' }}>
+                      <span className="muted">{r.name}</span>
+                      <b
+                        style={{ textAlign: 'right', ...(isNeg ? { color: 'var(--bad)' } : {}) }}
+                        className={val == null ? 'faint' : ''}
+                      >
+                        {val == null ? '—' : fmt(val)}
+                      </b>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

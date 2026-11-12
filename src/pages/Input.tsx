@@ -79,7 +79,7 @@ export function TeamList() {
                           <Icon n="lock" size={12} /> Kunci
                         </span>
                       )}
-                      <div className="num" style={{ fontWeight: 800, fontSize: 16 }}>{fmt(cs!.score)}</div>
+                      <div className="num" style={{ fontWeight: 800, fontSize: 16, ...(cs!.score < 0 ? { color: 'var(--bad)' } : {}) }}>{fmt(cs!.score)}</div>
                     </div>
                     {!cs!.complete ? <span className="chip gold" style={{ height: 20, fontSize: 11 }}>Belum lengkap</span> : rankMap.get(t.id) ? <div className="xs faint">peringkat {rankMap.get(t.id)}</div> : null}
                   </div>

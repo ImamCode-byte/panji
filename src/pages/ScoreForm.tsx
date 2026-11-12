@@ -264,7 +264,7 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
           <div className="in">
             <div className="grow">
               <div className="xs muted">{dq ? 'Diskualifikasi' : cs.penalty ? `Dikurangi ${fmt(cs.penalty)}` : 'Nilai'}</div>
-              <div className="sc2 num">{fmt(cs.score)}<span className="faint" style={{ fontSize: 15, fontFamily: 'var(--f)' }}> / {fmt(max)}</span></div>
+              <div className="sc2 num" style={cs.score < 0 ? { color: 'var(--bad)' } : undefined}>{fmt(cs.score)}<span className="faint" style={{ fontSize: 15, fontFamily: 'var(--f)' }}> / {fmt(max)}</span></div>
               {!dq && empties > 0 && <div className="xs" style={{ color: 'var(--accent)', fontWeight: 700 }}>{empties} isian belum diisi (Disimpan draf)</div>}
             </div>
             {isLocked ? (

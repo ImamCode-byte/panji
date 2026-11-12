@@ -48,7 +48,7 @@ export function contestScore(def: ContestDef, rec: Pick<ScoreRec, 'data' | 'dq'>
     base = def.normalizeTo && rm > 0 ? (raw * def.normalizeTo) / rm : raw;
   }
   const penalty = def.penalties.reduce((a, p) => a + p.points * Math.max(0, Number(d.p?.[p.id]) || 0), 0);
-  return { score: round2(Math.max(0, base - penalty)), base: round2(base), penalty, complete, dq: false };
+  return { score: round2(base - penalty), base: round2(base), penalty, complete, dq: false };
 }
 
 export interface Entry { teamId: string; score: number; rec: ScoreRec; dq: boolean }
