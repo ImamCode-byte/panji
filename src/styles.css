@@ -110,8 +110,11 @@ a{color:inherit;text-decoration:none}
 .tw{overflow:auto;border:1px solid var(--line);border-radius:var(--r2);background:var(--card);box-shadow:var(--sh);max-height:76vh}
 table.t{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 .t th{position:sticky;top:0;z-index:2;background:#f4eee0;text-align:right;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);padding:10px 12px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.t thead tr:first-child th{top:0;z-index:3}
+.t thead tr:nth-child(2) th{top:36px;z-index:2;font-size:11px;padding:8px 10px}
+.t th.grp{text-align:center;border-left:1px solid var(--line2);border-right:1px solid var(--line2);background:#ece3cf}
 .t td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;transition:background .15s ease}
-.t th.l,.t td.l{text-align:left} .t tr:last-child td{border-bottom:0}
+.t th.l,.t td.l{text-align:left} .t th.c,.t td.c{text-align:center} .t tr:last-child td{border-bottom:0}
 .t .stk{position:sticky;left:0;z-index:1;background:var(--card)} .t th.stk{z-index:3;background:#f4eee0}
 .t tr:hover td{background:#faf5ea} .t tr:hover td.stk{background:#faf5ea}
 .t td.tot{font-weight:800;font-size:15px}

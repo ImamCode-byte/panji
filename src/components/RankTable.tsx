@@ -19,16 +19,26 @@ export function RankTable({ lines, recap, provisional }: { lines: Line[]; recap:
     <>
       <div className="tw show-d">
         <table className="t">
-          <thead><tr>
-            <th className="l stk" style={{ minWidth: 250 }}>Regu</th>
-            <th className="l">Pangkalan</th>
-            {recap.map((r) => <th key={r.key} title={`${r.name} (maks ${r.max})`}>{ABBR[r.key] ?? r.name}</th>)}
-            <th>Total</th><th className="l">Kategori</th>
-          </tr></thead>
+          <thead>
+            <tr>
+              <th rowSpan={2} className="c" style={{ width: 56, minWidth: 50 }}>Rank</th>
+              <th rowSpan={2} className="c" style={{ width: 68, minWidth: 60 }}>No. Kav.</th>
+              <th rowSpan={2} className="l" style={{ minWidth: 150 }}>Regu</th>
+              <th rowSpan={2} className="l" style={{ minWidth: 160 }}>Pangkalan</th>
+              <th colSpan={recap.length} className="grp">Perlombaan</th>
+              <th rowSpan={2} style={{ minWidth: 75 }}>Total</th>
+              <th rowSpan={2} className="l" style={{ minWidth: 130 }}>Kategori</th>
+            </tr>
+            <tr>
+              {recap.map((r) => <th key={r.key} title={`${r.name} (maks ${r.max})`}>{ABBR[r.key] ?? r.name}</th>)}
+            </tr>
+          </thead>
           <tbody>
             {lines.map((l) => (
               <tr key={l.no}>
-                <td className="l stk"><div className="row"><Rank n={l.rank} tie={l.tie} /><span className="noBadge" style={{ minWidth: 30, height: 26, fontSize: 12 }}>{String(l.no).padStart(2, '0')}</span><b>{l.name}</b></div></td>
+                <td className="c"><Rank n={l.rank} tie={l.tie} /></td>
+                <td className="c"><span className="noBadge" style={{ minWidth: 32, height: 26, fontSize: 12 }}>{String(l.no).padStart(2, '0')}</span></td>
+                <td className="l"><b>{l.name}</b></td>
                 <td className="l muted">{l.pangkalan}</td>
                 {recap.map((r) => <td key={r.key} className={l.s[r.key] == null ? 'faint' : ''}>{l.s[r.key] == null ? '·' : fmt(l.s[r.key])}</td>)}
                 <td className="tot">{fmt(l.total)}</td>
