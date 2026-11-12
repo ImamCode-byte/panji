@@ -109,18 +109,25 @@ a{color:inherit;text-decoration:none}
 /* tables */
 .tw{overflow:auto;border:1px solid var(--line);border-radius:var(--r2);background:var(--card);box-shadow:var(--sh);max-height:76vh}
 table.t{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
-.t th{position:sticky;top:0;z-index:2;background:#f4eee0;text-align:right;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);padding:10px 12px;border-bottom:1px solid var(--line2);white-space:nowrap}
-.t thead tr:first-child th{top:0;z-index:3}
-.t thead tr:nth-child(2) th{top:36px;z-index:2;font-size:11px;padding:8px 10px}
+.t th{position:sticky;top:0;z-index:10;background:#f4eee0;text-align:right;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);padding:10px 12px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.t thead tr:first-child th{top:0;z-index:10}
+.t thead tr:nth-child(2) th{top:36px;z-index:9;font-size:11px;padding:8px 10px}
 .t th.grp{text-align:center;border-left:1px solid var(--line2);border-right:1px solid var(--line2);background:#ece3cf}
 .t td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;transition:background .15s ease}
 .t th.l,.t td.l{text-align:left} .t th.c,.t td.c{text-align:center} .t tr:last-child td{border-bottom:0}
-.t .stk{position:sticky;left:0;z-index:1;background:var(--card)} .t th.stk{z-index:3;background:#f4eee0}
-.t .stk-1{position:sticky;left:0;width:56px;min-width:56px;max-width:56px;z-index:4;background:var(--card);box-sizing:border-box}
-.t .stk-2{position:sticky;left:56px;width:68px;min-width:68px;max-width:68px;z-index:4;background:var(--card);box-sizing:border-box}
-.t .stk-3{position:sticky;left:124px;min-width:160px;z-index:4;background:var(--card);border-right:2px solid var(--line2);box-shadow:4px 0 8px -3px rgba(40,30,20,.12)}
-.t thead th.stk-1,.t thead th.stk-2,.t thead th.stk-3{z-index:6;background:#f4eee0}
-.t tr:hover td{background:#faf5ea} .t tr:hover td.stk,.t tr:hover td.stk-1,.t tr:hover td.stk-2,.t tr:hover td.stk-3{background:#faf5ea}
+
+/* Kolom sticky sisi kiri (Rank, No. Kav., Regu) */
+.t tbody tr td.stk-1{position:sticky;left:0;width:56px;min-width:56px;max-width:56px;z-index:20 !important;background:var(--card) !important;box-sizing:border-box}
+.t tbody tr td.stk-2{position:sticky;left:56px;width:68px;min-width:68px;max-width:68px;z-index:20 !important;background:var(--card) !important;box-sizing:border-box}
+.t tbody tr td.stk-3{position:sticky;left:124px;min-width:160px;z-index:20 !important;background:var(--card) !important;border-right:2px solid var(--line2);box-shadow:4px 0 8px -3px rgba(40,30,20,.16)}
+
+/* Header pojok kiri atas (Perpotongan Sticky Horisontal & Vertikal) */
+.t thead th.stk-1,.t thead tr:first-child th.stk-1{position:sticky;left:0;top:0;width:56px;min-width:56px;max-width:56px;z-index:50 !important;background:#f4eee0 !important;box-sizing:border-box}
+.t thead th.stk-2,.t thead tr:first-child th.stk-2{position:sticky;left:56px;top:0;width:68px;min-width:68px;max-width:68px;z-index:50 !important;background:#f4eee0 !important;box-sizing:border-box}
+.t thead th.stk-3,.t thead tr:first-child th.stk-3{position:sticky;left:124px;top:0;min-width:160px;z-index:50 !important;background:#f4eee0 !important;border-right:2px solid var(--line2);box-shadow:4px 0 8px -3px rgba(40,30,20,.16)}
+
+.t tr:hover td{background:#faf5ea}
+.t tbody tr:hover td.stk-1,.t tbody tr:hover td.stk-2,.t tbody tr:hover td.stk-3{background:#faf5ea !important}
 .t td.tot{font-weight:800;font-size:15px}
 .show-d{display:none} @media(min-width:820px){.show-d{display:block}.show-m{display:none}}
 
