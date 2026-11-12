@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { Icon, Mark } from './components/ui';
 import { DevFooter } from './components/DevFooter';
@@ -32,6 +32,7 @@ const NAV = [
 
 function Shell() {
   const { me, booting, signOut, pending, online, demo, cfg } = useApp();
+  const [loggingOut, setLoggingOut] = useState(false);
   const loc = useLocation();
   if (booting) return <div className="auth"><Mark size={56} /></div>;
   if (!me) return <Navigate to="/masuk" replace state={{ from: loc.pathname }} />;
@@ -47,7 +48,18 @@ function Shell() {
         <div className="me">
           <div style={{ fontWeight: 700, color: '#fff' }} className="trunc">{me.name}</div>
           <div className="xs" style={{ opacity: .65, marginBottom: 10 }}>{admin ? 'Admin' : 'Juri'}</div>
-          <button className="btn sm block" style={{ background: 'transparent', color: '#eadfca', borderColor: 'rgba(255,255,255,.25)' }} onClick={signOut}><Icon n="logout" size={17} />Keluar</button>
+          <button
+            className="btn sm block"
+            style={{ background: 'transparent', color: '#eadfca', borderColor: 'rgba(255,255,255,.25)' }}
+            disabled={loggingOut}
+            onClick={async () => {
+              setLoggingOut(true);
+              await signOut();
+            }}
+          >
+            <Icon n="logout" size={17} />
+            {loggingOut ? 'Keluar…' : 'Keluar'}
+          </button>
           <DevFooter variant="sidebar" />
         </div>
       </aside>

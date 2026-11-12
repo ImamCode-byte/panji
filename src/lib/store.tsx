@@ -3,7 +3,7 @@ import { api, NetErr, type Loaded } from './data';
 import { DEFAULT_CONFIG } from './contests';
 import { computeStandings, type Standings } from './scoring';
 import { buildSnapshot } from './snapshot';
-import { DEMO } from './supabase';
+import { DEMO, sb } from './supabase';
 import type { Config, Profile, ScoreRec, Team } from './types';
 
 const QK = 'panji.queue.v1';
@@ -76,7 +76,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     api.session().then((p) => { setMe(p); setBooting(false); }).catch(() => setBooting(false));
     const on = () => { setOnline(true); flush(); }, off = () => setOnline(false);
     window.addEventListener('online', on); window.addEventListener('offline', off);
-    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
+
+    let authUnsub: (() => void) | undefined;
+    if (sb) {
+      const { data: { subscription } } = sb.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') {
+          setMe(null);
+          setData({ teams: [], scores: [], config: DEFAULT_CONFIG, profiles: [] });
+        }
+      });
+      authUnsub = () => subscription.unsubscribe();
+    }
+
+    return () => {
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
+      authUnsub?.();
+    };
   }, [flush]);
 
   useEffect(() => {
@@ -92,7 +108,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const st = useMemo(() => computeStandings(data.teams, data.scores, data.config), [data]);
 
   const signIn = useCallback(async (u: string, p: string) => { setMe(await api.signIn(u, p)); }, []);
-  const signOut = useCallback(async () => { await api.signOut(); setMe(null); setData({ teams: [], scores: [], config: DEFAULT_CONFIG, profiles: [] }); }, []);
+  const signOut = useCallback(async () => {
+    try {
+      await api.signOut();
+    } catch (e) {
+      console.warn('SignOut error:', e);
+    } finally {
+      setMe(null);
+      setData({ teams: [], scores: [], config: DEFAULT_CONFIG, profiles: [] });
+      window.location.replace('/masuk');
+    }
+  }, []);
 
   const saveScore = useCallback(async (r: ScoreRec) => {
     const m = meRef.current!;

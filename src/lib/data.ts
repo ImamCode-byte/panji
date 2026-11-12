@@ -240,7 +240,32 @@ export const api = {
     recordLogin(p).catch(() => {});
     return p;
   },
-  async signOut() { if (DEMO) { const d = dload(); d.me = null; dsave(d); } else await sb!.auth.signOut(); },
+  async signOut() {
+    if (DEMO) {
+      const d = dload();
+      d.me = null;
+      dsave(d);
+    } else if (sb) {
+      try {
+        await sb.auth.signOut({ scope: 'local' });
+      } catch (e) {
+        console.warn('Supabase local signOut error:', e);
+      }
+      try {
+        sb.auth.signOut().catch(() => {});
+      } catch {}
+      try {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && (k.startsWith('sb-') || k.includes('supabase.auth'))) {
+            keysToRemove.push(k);
+          }
+        }
+        keysToRemove.forEach((k) => localStorage.removeItem(k));
+      } catch {}
+    }
+  },
 
   async load(admin: boolean): Promise<Loaded> {
     if (DEMO) { const d = dload(); return { teams: d.teams, scores: d.scores, config: mergeConfig(d.config), profiles: d.users.map(strip) }; }
