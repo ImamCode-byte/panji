@@ -3,14 +3,14 @@
   "short_name": "PANJI PARISADA",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f4efe6",
-  "theme_color": "#2b2118",
+  "background_color": "#f2ede2",
+  "theme_color": "#f2ede2",
   "icons": [
     {
       "src": "/parisada.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

@@ -144,6 +144,11 @@ table.t{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 .toast{background:var(--brand);color:#f6ecd8;padding:11px 16px;border-radius:11px;font-weight:600;font-size:14px;box-shadow:0 10px 30px -8px rgba(0,0,0,.5);animation:toastIn .22s cubic-bezier(0.16,1,0.3,1);max-width:440px}
 .toast.err{background:var(--bad)}
 
+/* booting / splash */
+.booting{min-height:100vh;display:grid;place-items:center;background:var(--bg);padding:24px;animation:fi .2s ease-out}
+.booting .boot-logo{filter:drop-shadow(0 6px 18px rgba(51,38,26,.14));animation:bootPulse 1.8s ease-in-out infinite}
+@keyframes bootPulse{0%,100%{transform:scale(1);opacity:.96}50%{transform:scale(1.06);opacity:1}}
+
 /* login */
 .auth{min-height:100%;display:grid;place-items:center;padding:24px 16px;background:var(--brand);background-image:radial-gradient(circle at 20% 0,rgba(191,125,28,.18),transparent 45%)}
 .auth .card{width:100%;max-width:400px;padding:26px 22px;animation:pageFadeIn .32s cubic-bezier(0.16,1,0.3,1) both}

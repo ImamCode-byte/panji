@@ -30,11 +30,17 @@ const NAV = [
   { to: '/app/pengaturan', label: 'Pengaturan', icon: 'sliders', admin: true },
 ];
 
+const BootScreen = () => (
+  <div className="booting" role="status" aria-label="Memuat aplikasi">
+    <Mark size={72} className="boot-logo" />
+  </div>
+);
+
 function Shell() {
   const { me, booting, signOut, pending, online, demo, cfg } = useApp();
   const [loggingOut, setLoggingOut] = useState(false);
   const loc = useLocation();
-  if (booting) return <div className="auth"><Mark size={56} /></div>;
+  if (booting) return <BootScreen />;
   if (!me) return <Navigate to="/masuk" replace state={{ from: loc.pathname }} />;
   const admin = me.role === 'admin';
   const items = NAV.filter((n) => admin || !n.admin);
@@ -84,7 +90,7 @@ function Shell() {
 
 function AdminOnly({ children }: { children: JSX.Element }) {
   const { me, booting } = useApp();
-  if (booting) return <div className="auth"><Mark size={56} /></div>;
+  if (booting) return <BootScreen />;
   if (!me) return <Navigate to="/masuk" replace />;
   return me.role === 'admin' ? children : <Navigate to="/app" replace />;
 }

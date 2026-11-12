@@ -9,7 +9,8 @@ export default function Login() {
   const nav = useNavigate();
   const [u, setU] = useState(''); const [p, setP] = useState(''); const [show, setShow] = useState(false);
   const [err, setErr] = useState(''); const [busy, setBusy] = useState(false);
-  if (me && !booting) return <Navigate to="/app" replace />;
+  if (booting) return <div className="booting" role="status" aria-label="Memuat aplikasi"><Mark size={72} className="boot-logo" /></div>;
+  if (me) return <Navigate to="/app" replace />;
   const go = async (e: React.FormEvent) => {
     e.preventDefault(); setErr(''); setBusy(true);
     try { await signIn(u, p); nav('/app', { replace: true }); } catch (x) { setErr((x as Error).message); } finally { setBusy(false); }
