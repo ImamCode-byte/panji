@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { fmt, Icon, Stepper, Switch } from '../components/ui';
 import { canJudge } from '../lib/access';
-import { eligible, hhmm } from '../lib/progress';
+import { hhmm } from '../lib/progress';
 import { contestScore, instMax, reps, scoreMax } from '../lib/scoring';
 import { useApp } from '../lib/store';
 import type { ContestDef, ScoreData, ScoreRec } from '../lib/types';
@@ -20,12 +20,12 @@ export default function ScoreForm() {
   const existing = scores.find((s) => s.team_id === teamId && s.contest === key);
   if (!def || !team || !canJudge(me, key)) return <Navigate to={`/app/input/${key}`} replace />;
   return <Form key={`${key}-${teamId}-${existing?.updated_at ?? 'new'}`} def={def} teamId={teamId} existing={existing}
-    onDone={(next) => nav(next ? `/app/input/${key}/${next}` : `/app/input/${key}`, { replace: true })}
+    onDone={() => nav(`/app/input/${key}`, { replace: true })}
     ctx={{ me, teams, scores, st, cfg, profiles, saveScore, removeScore, toast }} nav={() => nav(`/app/input/${key}`)} />;
 }
 
 type Ctx = Pick<ReturnType<typeof useApp>, 'me' | 'teams' | 'scores' | 'st' | 'cfg' | 'profiles' | 'saveScore' | 'removeScore' | 'toast'>;
-function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; teamId: string; existing?: ScoreRec; onDone: (next?: string) => void; ctx: Ctx; nav: () => void }) {
+function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; teamId: string; existing?: ScoreRec; onDone: () => void; ctx: Ctx; nav: () => void }) {
   const { me, teams, scores, st, cfg, profiles, saveScore, removeScore, toast } = ctx;
   const team = teams.find((t) => t.id === teamId)!;
   const [vals, setVals] = useState<Record<string, string[]>>(() =>
@@ -59,12 +59,6 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
   const cs = contestScore(def, { data, dq });
   const max = scoreMax(def);
 
-  const nextTeam = () => {
-    const list = eligible(def.key, teams, st, cfg);
-    const after = list.filter((t) => t.no > team.no && !scores.some((s) => s.contest === def.key && s.team_id === t.id));
-    return after[0]?.id;
-  };
-
   const handlePromptSave = () => {
     if (isLocked) return;
     if (invalid) { toast('Ada isian di luar batas nilai', 'err'); return; }
@@ -87,7 +81,7 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
       } else {
         toast(r === 'queued' ? 'Disimpan di perangkat & nilai dikunci' : isSaved ? 'Perubahan disimpan & nilai dikunci' : 'Nilai lengkap tersimpan & dikunci');
       }
-      onDone(nextTeam());
+      onDone();
     } catch (e) { toast((e as Error).message, 'err'); } finally { setBusy(false); }
   };
 
