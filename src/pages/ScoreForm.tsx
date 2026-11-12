@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { fmt, Icon, Stepper, Switch } from '../components/ui';
@@ -35,6 +35,14 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
   const [dq, setDq] = useState(existing?.dq ?? false); const [note, setNote] = useState(existing?.note ?? '');
   const [busy, setBusy] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  useEffect(() => {
+    if (confirmOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [confirmOpen]);
 
   const isAdmin = me?.role === 'admin';
   const isSaved = !!existing;
@@ -274,14 +282,28 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
         document.body
       )}
 
-      {confirmOpen && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1200,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
-        }}>
-          <div className="card pad stack" style={{ maxWidth: 440, width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
+      {confirmOpen && createPortal(
+        <div
+          className="sbg"
+          style={{ zIndex: 9999, background: 'rgba(0,0,0,0.65)' }}
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget && !busy) setConfirmOpen(false);
+          }}
+        >
+          <div
+            className="card pad stack"
+            role="dialog"
+            aria-modal="true"
+            style={{
+              maxWidth: 460,
+              width: '100%',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
+              animation: 'modalCenter .24s cubic-bezier(0.16,1,0.3,1)',
+              margin: 'auto',
+            }}
+          >
             <div className="row" style={{ gap: 10, alignItems: 'center' }}>
-              <span style={{ fontSize: 26 }}>{isComplete ? '🔒' : '📝'}</span>
+              <span style={{ fontSize: 28, flex: 'none' }}>{isComplete ? '🔒' : '📝'}</span>
               <div>
                 <b style={{ fontSize: 16 }}>
                   {!isComplete
@@ -314,7 +336,8 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
