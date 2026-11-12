@@ -99,6 +99,15 @@ export default function Audit() {
                   <b style={{ fontSize: 14 }}>{r.name || r.username}</b>
                   <span className={`chip ${r.role === 'admin' ? 'gold' : ''}`} style={{ fontSize: 10, padding: '2px 7px', height: 'auto' }}>{r.role}</span>
                   <span className="xs muted">({r.email || r.username})</span>
+                  {r.source === 'gps' ? (
+                    <span className="chip ok" style={{ fontSize: 10, padding: '2px 6px', height: 'auto' }} title={`Akurasi GPS ±${r.accuracy ?? 10} meter dari sensor perangkat`}>
+                      <Icon n="check" size={11} /> GPS Akurat {r.accuracy ? `(±${r.accuracy}m)` : ''}
+                    </span>
+                  ) : (
+                    <span className="chip" style={{ fontSize: 10, padding: '2px 6px', height: 'auto', background: '#ece3cf' }} title="Perkiraan berdasarkan IP Provider">
+                      🌐 Perkiraan IP
+                    </span>
+                  )}
                 </div>
                 <div className="xs muted" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 5, alignItems: 'center' }}>
                   <span>📱 {r.device || 'Perangkat'}</span>
@@ -113,12 +122,12 @@ export default function Audit() {
                     href={r.maps_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn sm"
-                    style={{ fontSize: 11, padding: '3px 8px', height: 26, textDecoration: 'none', background: '#ece3cf', color: 'var(--brand)', fontWeight: 650 }}
-                    title="Buka titik koordinat pengakses di Google Maps"
+                    className={`btn sm ${r.source === 'gps' ? 'primary' : ''}`}
+                    style={{ fontSize: 11, padding: '3px 8px', height: 26, textDecoration: 'none', fontWeight: 650 }}
+                    title={r.source === 'gps' ? 'Buka koordinat GPS akurat di Google Maps' : 'Buka perkiraan area di Google Maps'}
                   >
                     <Icon n="globe" size={13} />
-                    <span>Buka Lokasi</span>
+                    <span>{r.source === 'gps' ? 'Titik GPS Akurat' : 'Buka Lokasi'}</span>
                   </a>
                 ) : (
                   <span className="xs faint">Tanpa peta</span>

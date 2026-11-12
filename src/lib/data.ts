@@ -73,9 +73,74 @@ async function fetchGeoLocation(): Promise<{ ip: string; city: string; region: s
   return fallback;
 }
 
+async function getDeviceGPS(): Promise<{ latitude: number; longitude: number; accuracy: number } | null> {
+  if (typeof navigator === 'undefined' || !navigator.geolocation) return null;
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(null), 8000);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        clearTimeout(timer);
+        resolve({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracy: Math.round(pos.coords.accuracy),
+        });
+      },
+      () => {
+        clearTimeout(timer);
+        resolve(null);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 7500,
+        maximumAge: 0,
+      }
+    );
+  });
+}
+
+async function fetchRealLocation(): Promise<{
+  ip: string;
+  city: string;
+  region: string;
+  country: string;
+  latitude: number | null;
+  longitude: number | null;
+  accuracy: number | null;
+  source: 'gps' | 'ip';
+  maps_url: string;
+}> {
+  const [gps, ipInfo] = await Promise.all([
+    getDeviceGPS(),
+    fetchGeoLocation(),
+  ]);
+
+  if (gps) {
+    const lat = gps.latitude;
+    const lon = gps.longitude;
+    return {
+      ip: ipInfo.ip,
+      city: ipInfo.city !== 'Tidak diketahui' ? ipInfo.city : 'Titik GPS Terdeteksi',
+      region: ipInfo.region || '',
+      country: ipInfo.country || 'Indonesia',
+      latitude: lat,
+      longitude: lon,
+      accuracy: gps.accuracy,
+      source: 'gps',
+      maps_url: `https://www.google.com/maps?q=${lat},${lon}`,
+    };
+  }
+
+  return {
+    ...ipInfo,
+    accuracy: null,
+    source: 'ip',
+  };
+}
+
 async function recordLogin(user: { id?: string; username: string; name: string; role: string; email?: string }) {
   try {
-    const geo = await fetchGeoLocation();
+    const geo = await fetchRealLocation();
     const device = parseDevice();
     const email = user.email || (user.username.includes('@') ? user.username : `${user.username}@panji.internal`);
     const logItem: LoginLog = {
@@ -91,6 +156,8 @@ async function recordLogin(user: { id?: string; username: string; name: string; 
       country: geo.country,
       latitude: geo.latitude,
       longitude: geo.longitude,
+      accuracy: geo.accuracy,
+      source: geo.source,
       maps_url: geo.maps_url,
       device,
       at: new Date().toISOString(),
@@ -106,7 +173,7 @@ async function recordLogin(user: { id?: string; username: string; name: string; 
     }
 
     if (sb) {
-      await sb.from('login_logs').insert({
+      const row: Record<string, unknown> = {
         user_id: user.id || null,
         username: user.username,
         name: user.name,
@@ -118,9 +185,17 @@ async function recordLogin(user: { id?: string; username: string; name: string; 
         country: geo.country,
         latitude: geo.latitude,
         longitude: geo.longitude,
+        accuracy: geo.accuracy,
+        source: geo.source,
         maps_url: geo.maps_url,
         device,
-      });
+      };
+      let res = await sb.from('login_logs').insert(row);
+      if (res.error && (res.error.message?.includes('accuracy') || res.error.message?.includes('source'))) {
+        delete row.accuracy;
+        delete row.source;
+        res = await sb.from('login_logs').insert(row);
+      }
     }
   } catch (e) {
     console.warn('Gagal mencatat login_logs:', e);

@@ -70,6 +70,8 @@ export interface LoginLog {
   country: string;
   latitude?: number | null;
   longitude?: number | null;
+  accuracy?: number | null;
+  source?: 'gps' | 'ip';
   maps_url: string;
   device: string;
   at: string;

@@ -55,10 +55,14 @@ create table if not exists public.login_logs (
   country text not null default '',
   latitude double precision,
   longitude double precision,
+  accuracy double precision,
+  source text not null default 'ip',
   maps_url text not null default '',
   device text not null default '',
   at timestamptz not null default now()
 );
+alter table if exists public.login_logs add column if not exists accuracy double precision;
+alter table if exists public.login_logs add column if not exists source text not null default 'ip';
 
 -- helper peran
 create or replace function public.is_admin() returns boolean
