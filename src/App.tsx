@@ -22,7 +22,7 @@ const Print = lazy(() => import('./pages/Print'));
 const NAV = [
   { to: '/app', label: 'Beranda', icon: 'home', end: true, m: true },
   { to: '/app/input', label: 'Input nilai', mlabel: 'Input', icon: 'edit', m: true },
-  { to: '/app/klasemen', label: 'Klasemen', icon: 'list', m: true },
+  { to: '/app/klasemen', label: 'Klasemen', icon: 'list', m: true, admin: true },
   { to: '/app/juara', label: 'Juara', icon: 'trophy', m: true, admin: true },
   { to: '/app/regu', label: 'Regu', icon: 'users', admin: true },
   { to: '/app/akun', label: 'Akun juri', icon: 'user', admin: true },
@@ -108,7 +108,7 @@ export default function App() {
           <Route path="input" element={<ContestList />} />
           <Route path="input/:key" element={<TeamList />} />
           <Route path="input/:key/:teamId" element={<ScoreForm />} />
-          <Route path="klasemen" element={<Standings />} />
+          <Route path="klasemen" element={<AdminOnly><Standings /></AdminOnly>} />
           <Route path="juara" element={<AdminOnly><Awards /></AdminOnly>} />
           <Route path="regu" element={<AdminOnly><L><Teams /></L></AdminOnly>} />
           <Route path="akun" element={<AdminOnly><L><Users /></L></AdminOnly>} />

@@ -29,6 +29,7 @@ export default function Menu() {
           {loggingOut ? 'Keluar…' : 'Keluar'}
         </button>
         {demo && <p className="xs faint" style={{ textAlign: 'center' }}>Mode demo aktif.</p>}
+        {demo && <p className="xs faint" style={{ textAlign: 'center' }}>{me?.username} || {me?.name}</p>}
         <DevFooter />
       </div>
     </div>

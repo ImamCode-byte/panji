@@ -43,7 +43,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="grid g2" style={{ alignItems: 'start' }}>
+        <div className={admin ? "grid g2" : "stack"} style={{ alignItems: 'start' }}>
           <section>
             <div className="row between" style={{ marginBottom: 8 }}><h2 className="eyebrow">Progres lomba</h2></div>
             <div className="list">
@@ -55,18 +55,20 @@ export default function Dashboard() {
               ))}
             </div>
           </section>
-          <section>
-            <div className="row between" style={{ marginBottom: 8 }}><h2 className="eyebrow">Posisi sementara</h2><Link to="/app/klasemen" className="xs" style={{ fontWeight: 700, color: 'var(--accent)' }}>Lihat semua</Link></div>
-            <div className="list">
-              {st.rows.filter((r) => r.rank > 0).slice(0, 8).map((r) => (
-                <div key={r.team.id} className="li" style={{ cursor: 'default' }}>
-                  <Rank n={r.rank} tie={r.tie} /><div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{r.team.name}</div><div className="trunc xs muted">{r.team.pangkalan}</div></div>
-                  <b className="num">{fmt(r.total)}</b>
-                </div>
-              ))}
-              {!st.rows.some((r) => r.done > 0) && <div className="empty">Belum ada nilai masuk.</div>}
-            </div>
-          </section>
+          {admin && (
+            <section>
+              <div className="row between" style={{ marginBottom: 8 }}><h2 className="eyebrow">Posisi sementara</h2><Link to="/app/klasemen" className="xs" style={{ fontWeight: 700, color: 'var(--accent)' }}>Lihat semua</Link></div>
+              <div className="list">
+                {st.rows.filter((r) => r.rank > 0).slice(0, 8).map((r) => (
+                  <div key={r.team.id} className="li" style={{ cursor: 'default' }}>
+                    <Rank n={r.rank} tie={r.tie} /><div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{r.team.name}</div><div className="trunc xs muted">{r.team.pangkalan}</div></div>
+                    <b className="num">{fmt(r.total)}</b>
+                  </div>
+                ))}
+                {!st.rows.some((r) => r.done > 0) && <div className="empty">Belum ada nilai masuk.</div>}
+              </div>
+            </section>
+          )}
         </div>
         {!admin && !list.some((c) => canJudge(me, c.key)) && <div className="card pad muted">Belum ada lomba yang ditugaskan. Hubungi admin.</div>}
       </div>

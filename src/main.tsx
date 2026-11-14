@@ -10,8 +10,8 @@ import App from './App';
 if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then((reg) => {
-      reg.update().catch(() => {});
-    }).catch(() => {});
+      reg.update().catch(() => { });
+    }).catch(() => { });
   });
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     window.location.reload();
