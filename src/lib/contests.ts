@@ -72,13 +72,13 @@ export const DEFAULT_CONTESTS: ContestDef[] = [
   },
   {
     key: 'lkbb', name: 'LKBB Variasi', hari: hari(2), jam: '07.00–11.00', personil: '9 orang', inRecap: true,
-    criteria: [c('kebenaran', 'Kebenaran', 120), c('variasi', 'Variasi', 45), c('kompak', 'Kekompakan', 35)],
+    criteria: [c('juri1', 'Juri 1', 150), c('juri2', 'Juri 2', 150)],
     penalties: [
       GADUH, { id: 'batas', label: 'Melewati batas yang ditentukan', points: 5 },
       { id: 'kavling', label: 'Melewati batas kavling', points: 5 }, OFFICIAL,
       { id: 'aba', label: 'Danton tidak menyebutkan aba-aba', points: 10, unit: 'aba-aba' },
     ],
-    tieBreak: ['kebenaran'], dqNotes: DQ_UMUM,
+    tieBreak: ['juri1'], dqNotes: DQ_UMUM,
   },
   {
     key: 'danton', name: 'Danton Terbaik', hari: hari(2), jam: '07.00–11.00', personil: 'Danton', inRecap: false,
