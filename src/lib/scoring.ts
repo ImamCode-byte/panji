@@ -120,9 +120,7 @@ export function computeStandings(teams: Team[], scores: ScoreRec[], cfg: Config)
     per[d.key] = rankContest(d, entries);
   }
 
-  // Memory Scout Challenge: tahap tertinggi yang dicapai dulu, lalu nilai tahap itu
-  const { wPenyisihan: wp, wSemifinal: ws, wFinal: wf } = cfg.msc;
-  const wsum = wp + ws + wf || 1;
+  // Memory Scout Challenge: skema berjenjang (Penyisihan=20, Semifinal=40, Final Juara 1=100, Juara 2=80, Juara 3=60)
   const stages = ['msc_penyisihan', 'msc_semifinal', 'msc_final'] as const;
   const mscIds = new Set<string>();
   stages.forEach((k) => rec.get(k)?.forEach((_, id) => mscIds.add(id)));
@@ -131,8 +129,17 @@ export function computeStandings(teams: Team[], scores: ScoreRec[], cfg: Config)
     const tier = rec.get('msc_final')?.has(id) ? 2 : rec.get('msc_semifinal')?.has(id) ? 1 : 0;
     const r = rec.get(stages[tier])!.get(id)!;
     const dq = stages.some((k) => rec.get(k)?.get(id)?.dq);
-    const g = (k: string) => pts[k].get(id) ?? 0;
-    const score = round2((wp * g('msc_penyisihan') + ws * g('msc_semifinal') + wf * g('msc_final')) / wsum);
+    let score = 0;
+    if (!dq) {
+      if (tier === 2) {
+        const finalRank = per['msc_final']?.find((x) => x.teamId === id)?.rank ?? 1;
+        score = finalRank === 1 ? 100 : finalRank === 2 ? 80 : 60;
+      } else if (tier === 1) {
+        score = 40;
+      } else {
+        score = 20;
+      }
+    }
     mscEntries.push({ teamId: id, score, rec: r, dq, tier });
   });
   const mscCmp = (a: Entry, b: Entry) => {

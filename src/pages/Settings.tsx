@@ -459,12 +459,7 @@ export default function Settings() {
         </div>}
 
         {tab === 'm' && <div className="card pad stack">
-          <p className="sm muted">Juklak belum menetapkan cara nilai MSC masuk klasemen. Nilai MSC = rata-rata tertimbang tiga tahap (0–100). Peringkat MSC ditentukan tahap tertinggi yang dicapai.</p>
-          <div className="grid g3" style={{ gap: 10 }}>
-            <N l="Bobot penyisihan" v={d.msc.wPenyisihan} on={(n) => setD({ ...d, msc: { ...d.msc, wPenyisihan: n } })} />
-            <N l="Bobot semifinal" v={d.msc.wSemifinal} on={(n) => setD({ ...d, msc: { ...d.msc, wSemifinal: n } })} />
-            <N l="Bobot final" v={d.msc.wFinal} on={(n) => setD({ ...d, msc: { ...d.msc, wFinal: n } })} />
-          </div>
+          <p className="sm muted">Skema nilai MSC masuk klasemen umum: Terhenti di Penyisihan = 20 poin, Terhenti di Semifinal = 40 poin, Final Juara 1 = 100 poin, Final Juara 2 = 80 poin, Final Juara 3 = 60 poin.</p>
           <div className="grid g2" style={{ gap: 10 }}>
             <N l="Lolos ke semifinal (regu)" v={d.msc.qSemi} on={(n) => setD({ ...d, msc: { ...d.msc, qSemi: Math.round(n) } })} />
             <N l="Lolos ke final (regu)" v={d.msc.qFinal} on={(n) => setD({ ...d, msc: { ...d.msc, qFinal: Math.round(n) } })} />

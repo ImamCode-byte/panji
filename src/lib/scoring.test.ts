@@ -160,12 +160,61 @@ describe('Memory Scout Challenge', () => {
     const pen = (n: number, b: number) => rec(n, 'msc_penyisihan', { c: { benar: [b] }, t: { m: 20, s: 0 } });
     let st = computeStandings(t, [pen(1, 30), pen(2, 28), pen(3, 10)], cfg);
     expect([...mscQualifiers(st, cfg, 'msc_semifinal')].sort()).toEqual(['t1', 't2']);
+    // Pada tahap penyisihan, seluruh peserta penyisihan mendapatkan nilai sementara 20
+    expect(st.rows.find((r) => r.team.no === 3)?.scores.msc).toBe(20);
+
     const semi = (n: number, b: number) => rec(n, 'msc_semifinal', { c: { benar: [b] }, t: { m: 15, s: 0 } });
     st = computeStandings(t, [pen(1, 30), pen(2, 28), pen(3, 10), semi(1, 10), semi(2, 18)], cfg);
     expect([...mscQualifiers(st, cfg, 'msc_final')]).toEqual(['t2']);
+    // Semifinalis mendapatkan 40, sedangkan yang gugur di penyisihan tetap 20
+    expect(st.rows.find((r) => r.team.no === 1)?.scores.msc).toBe(40);
+    expect(st.rows.find((r) => r.team.no === 3)?.scores.msc).toBe(20);
+
     const fin = rec(2, 'msc_final', { c: { benar: [8] }, t: { m: 5, s: 0 } });
     st = computeStandings(t, [pen(1, 30), pen(2, 28), pen(3, 10), semi(1, 10), semi(2, 18), fin], cfg);
     expect(st.per.msc.map((r) => r.teamId)).toEqual(['t2', 't1', 't3']);
+    // Finalis Juara 1 mendapatkan 100
+    expect(st.rows.find((r) => r.team.no === 2)?.scores.msc).toBe(100);
+    expect(st.rows.find((r) => r.team.no === 1)?.scores.msc).toBe(40);
+    expect(st.rows.find((r) => r.team.no === 3)?.scores.msc).toBe(20);
+  });
+
+  it('skema nilai berjenjang: penyisihan=20, semifinal=40, final J1=100, J2=80, J3=60 masuk akumulasi', () => {
+    const cfg = { ...DEFAULT_CONFIG, msc: { ...DEFAULT_CONFIG.msc, qSemi: 4, qFinal: 3 } };
+    const t = [team(1), team(2), team(3), team(4), team(5)];
+    const pen = (n: number, b: number) => rec(n, 'msc_penyisihan', { c: { benar: [b] }, t: { m: 20, s: 0 } });
+    const semi = (n: number, b: number) => rec(n, 'msc_semifinal', { c: { benar: [b] }, t: { m: 15, s: 0 } });
+    const fin = (n: number, b: number) => rec(n, 'msc_final', { c: { benar: [b] }, t: { m: 10, s: 0 } });
+
+    // Regu 5 terhenti di penyisihan
+    // Regu 4 terhenti di semifinal
+    // Regu 1, 2, 3 masuk ke final
+    const scores = [
+      pen(1, 50), pen(2, 45), pen(3, 40), pen(4, 35), pen(5, 20),
+      semi(1, 30), semi(2, 28), semi(3, 25), semi(4, 15),
+      fin(1, 10), fin(2, 8), fin(3, 6), // Regu 1 = Rank 1, Regu 2 = Rank 2, Regu 3 = Rank 3
+    ];
+
+    const st = computeStandings(t, scores, cfg);
+
+    const r1 = st.rows.find((r) => r.team.no === 1);
+    const r2 = st.rows.find((r) => r.team.no === 2);
+    const r3 = st.rows.find((r) => r.team.no === 3);
+    const r4 = st.rows.find((r) => r.team.no === 4);
+    const r5 = st.rows.find((r) => r.team.no === 5);
+
+    expect(r1?.scores.msc).toBe(100);
+    expect(r2?.scores.msc).toBe(80);
+    expect(r3?.scores.msc).toBe(60);
+    expect(r4?.scores.msc).toBe(40);
+    expect(r5?.scores.msc).toBe(20);
+
+    // Nilai tersebut langsung masuk ke total nilai klasemen
+    expect(r1?.total).toBe(100);
+    expect(r2?.total).toBe(80);
+    expect(r3?.total).toBe(60);
+    expect(r4?.total).toBe(40);
+    expect(r5?.total).toBe(20);
   });
 });
 
