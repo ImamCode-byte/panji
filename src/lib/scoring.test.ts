@@ -45,9 +45,9 @@ describe('perhitungan nilai', () => {
     for (const x of def('tapak').criteria.filter((k) => k.id.startsWith('p_'))) c[x.id] = [x.max];
     expect(contestScore(def('tapak'), rec(1, 'tapak', { c })).score).toBe(200);
   });
-  it('Memanah: 3 panah × 10 → 100', () => {
-    expect(contestScore(def('memanah'), rec(1, 'memanah', { c: { panah: [10, 10, 10] } })).score).toBe(100);
-    expect(contestScore(def('memanah'), rec(1, 'memanah', { c: { panah: [10, 5, 0] } })).score).toBe(50);
+  it('Memanah: skala nilai 100', () => {
+    expect(contestScore(def('memanah'), rec(1, 'memanah', { c: { bobot: [100] } })).score).toBe(100);
+    expect(contestScore(def('memanah'), rec(1, 'memanah', { c: { bobot: [50] } })).score).toBe(50);
   });
   it('Regu Tergiat: rata-rata per hari', () => {
     const c = { disiplin: [90, 90, 90], aktif: [60, 60, 60], bersih: [30, 30, 30] };

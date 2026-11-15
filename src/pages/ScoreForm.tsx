@@ -211,7 +211,7 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
               <div className="sec-t">{g}</div>
               {cs2.map((c) => (
                 <div key={c.id} className="crit">
-                  <div className="h"><span className="lb">{c.label}</span><span className="mx num">{c.noMax ? 'Bebas (tanpa batas)' : `maks ${fmt(c.max)}${c.repeat && c.agg !== 'avg' ? ` (${fmt(instMax(c))}/${(c.repeatLabels?.[0] ?? '').toLowerCase().replace(/\s?\d$/, '') || 'sesi'})` : ''}`}</span></div>
+                  <div className="h"><span className="lb">{c.label}</span><span className="mx num">{c.maxLabel ?? (c.noMax ? 'Bebas (tanpa batas)' : `maks ${fmt(c.max)}${c.repeat && c.agg !== 'avg' ? ` (${fmt(instMax(c))}/${(c.repeatLabels?.[0] ?? '').toLowerCase().replace(/\s?\d$/, '') || 'sesi'})` : ''}`)}</span></div>
                   {c.hint && <div className="xs faint">{c.hint}</div>}
                   {reps(c) === 1 ? (
                     <Stepper label={c.label} max={c.noMax ? 999999 : instMax(c)} value={vals[c.id][0]} decimal={!c.int} bad={bad(c, 0)}

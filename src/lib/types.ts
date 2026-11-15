@@ -9,6 +9,7 @@ export interface Criterion {
   int?: boolean;       // jawaban bulat (jumlah soal benar)
   noTotal?: boolean;   // tidak masuk total, hanya untuk penentu seri
   noMax?: boolean;     // tanpa batas nilai maksimal (bebas diisi berapapun)
+  maxLabel?: string;   // label kustom untuk teks batas/skema (misal 'Skema')
 }
 export interface Penalty { id: string; label: string; points: number; unit?: string }
 export interface TimeField { label: string; formula?: 'obstacle'; hint?: string }

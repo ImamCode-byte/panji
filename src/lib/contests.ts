@@ -103,9 +103,9 @@ export const DEFAULT_CONTESTS: ContestDef[] = [
     penalties: [GADUH, WAKTU, OFFICIAL], tieBreak: ['time'], dqNotes: DQ_UMUM,
   },
   {
-    key: 'memanah', name: 'Memanah', hari: hari(2), jam: '12.30–14.20', personil: '1 orang', inRecap: true, normalizeTo: 100,
-    criteria: [c('panah', 'Skor panah', 30, { repeat: 3, repeatLabels: ['Panah 1', 'Panah 2', 'Panah 3'], hint: 'Maksimal 10 per panah' })],
-    penalties: [GADUH, OFFICIAL], tieBreak: [], dqNotes: DQ_UMUM,
+    key: 'memanah', name: 'Memanah', hari: hari(2), jam: '12.30–14.20', personil: '1 orang', inRecap: true,
+    criteria: [c('bobot', 'Bobot Nilai', 100, { group: 'Memanah', maxLabel: 'Skema' })],
+    penalties: [GADUH, OFFICIAL], tieBreak: ['bobot'], dqNotes: DQ_UMUM,
   },
   {
     key: 'msc_penyisihan', name: 'MSC · Penyisihan', hari: hari(2), jam: '12.30–14.20', personil: '2 orang', inRecap: true, stage: 'msc', normalizeTo: 100,
