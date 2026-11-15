@@ -160,12 +160,14 @@ export const DEFAULT_CONTESTS: ContestDef[] = [
   {
     key: 'tergiat', name: 'Regu Tergiat', hari: 'Sabtu–Senin', jam: 'Non rotasi', personil: 'Regu', inRecap: false, normalizeTo: 100,
     criteria: [
-      c('disiplin', 'Kedisiplinan', 100, { repeat: 3, repeatLabels: days, agg: 'avg' }),
-      c('aktif', 'Keaktifan', 100, { repeat: 3, repeatLabels: days, agg: 'avg' }),
-      c('bersih', 'Kebersihan tenda', 100, { repeat: 3, repeatLabels: days, agg: 'avg' }),
+      c('pioneering', 'Pioneering', 100, { group: 'Regu Tergiat' }),
+      c('msc', 'MSC', 100, { group: 'Regu Tergiat' }),
+      c('sandi', 'Sandi', 100, { group: 'Regu Tergiat' }),
+      c('memanah', 'Memanah', 100, { group: 'Regu Tergiat' }),
+      c('semaphore', 'Semaphore', 100, { group: 'Regu Tergiat' }),
     ],
-    penalties: [], tieBreak: ['disiplin'], dqNotes: DQ_UMUM,
-    note: 'Nilai non rotasi. Tiap hari dinilai 0–100, lalu dirata-rata.',
+    penalties: [], tieBreak: ['pioneering'], dqNotes: DQ_UMUM,
+    note: 'Nilai non rotasi. Masing-masing aspek dinilai 0–100, lalu dirata-rata ke skala 100.',
   },
 ];
 

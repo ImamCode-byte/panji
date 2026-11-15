@@ -52,9 +52,9 @@ describe('perhitungan nilai', () => {
     expect(contestScore(def('semaphore'), rec(1, 'semaphore', { c: { bobot: [85] } })).score).toBe(85);
     expect(def('semaphore').time).toBeUndefined();
   });
-  it('Regu Tergiat: rata-rata per hari', () => {
-    const c = { disiplin: [90, 90, 90], aktif: [60, 60, 60], bersih: [30, 30, 30] };
-    expect(contestScore(def('tergiat'), rec(1, 'tergiat', { c })).score).toBe(60);
+  it('Regu Tergiat: rata-rata dari 5 aspek', () => {
+    const c = { pioneering: [100], msc: [80], sandi: [60], memanah: [70], semaphore: [90] };
+    expect(contestScore(def('tergiat'), rec(1, 'tergiat', { c })).score).toBe(80);
   });
 });
 
