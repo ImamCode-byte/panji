@@ -48,7 +48,7 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
   const isSaved = !!existing;
   const bad = (c: (typeof def.criteria)[number], i: number) => {
     const n = toNum(vals[c.id][i]); if (n == null) return false;
-    return !Number.isFinite(n) || n < 0 || n > instMax(c) || (!!c.int && !Number.isInteger(n));
+    return !Number.isFinite(n) || n < 0 || (!c.noMax && n > instMax(c)) || (!!c.int && !Number.isInteger(n));
   };
   const empties = def.criteria.reduce((a, c) => a + vals[c.id].filter((v) => v.trim() === '').length, 0) + (def.time && !tm.trim() && !ts.trim() ? 1 : 0);
   const invalid = def.criteria.some((c) => vals[c.id].some((_, i) => bad(c, i))) || (!!def.time && (Number(tm || 0) < 0 || Number(ts || 0) > 59 || Number(ts || 0) < 0));
@@ -211,15 +211,15 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
               <div className="sec-t">{g}</div>
               {cs2.map((c) => (
                 <div key={c.id} className="crit">
-                  <div className="h"><span className="lb">{c.label}</span><span className="mx num">maks {fmt(c.max)}{c.repeat && c.agg !== 'avg' ? ` (${fmt(instMax(c))}/${(c.repeatLabels?.[0] ?? '').toLowerCase().replace(/\s?\d$/, '') || 'sesi'})` : ''}</span></div>
+                  <div className="h"><span className="lb">{c.label}</span><span className="mx num">{c.noMax ? 'Bebas (tanpa batas)' : `maks ${fmt(c.max)}${c.repeat && c.agg !== 'avg' ? ` (${fmt(instMax(c))}/${(c.repeatLabels?.[0] ?? '').toLowerCase().replace(/\s?\d$/, '') || 'sesi'})` : ''}`}</span></div>
                   {c.hint && <div className="xs faint">{c.hint}</div>}
                   {reps(c) === 1 ? (
-                    <Stepper label={c.label} max={instMax(c)} value={vals[c.id][0]} decimal={!c.int} bad={bad(c, 0)}
+                    <Stepper label={c.label} max={c.noMax ? 999999 : instMax(c)} value={vals[c.id][0]} decimal={!c.int} bad={bad(c, 0)}
                       onChange={(v) => setVals((s) => ({ ...s, [c.id]: [v] }))} />
                   ) : (
                     <div className="reps">{vals[c.id].map((v, i) => (
                       <div key={i}><div className="rl">{c.repeatLabels?.[i] ?? `#${i + 1}`}</div>
-                        <Stepper label={`${c.label} ${c.repeatLabels?.[i] ?? i + 1}`} max={instMax(c)} value={v} bad={bad(c, i)}
+                        <Stepper label={`${c.label} ${c.repeatLabels?.[i] ?? i + 1}`} max={c.noMax ? 999999 : instMax(c)} value={v} bad={bad(c, i)}
                           onChange={(nv) => setVals((s) => ({ ...s, [c.id]: s[c.id].map((x, j) => (j === i ? nv : x)) }))} /></div>
                     ))}</div>
                   )}
@@ -264,7 +264,12 @@ function Form({ def, teamId, existing, onDone, ctx, nav }: { def: ContestDef; te
           <div className="in">
             <div className="grow">
               <div className="xs muted">{dq ? 'Diskualifikasi' : cs.penalty ? `Dikurangi ${fmt(cs.penalty)}` : 'Nilai'}</div>
-              <div className="sc2 num" style={cs.score < 0 ? { color: 'var(--bad)' } : undefined}>{fmt(cs.score)}<span className="faint" style={{ fontSize: 15, fontFamily: 'var(--f)' }}> / {fmt(max)}</span></div>
+              <div className="sc2 num" style={cs.score < 0 ? { color: 'var(--bad)' } : undefined}>
+                {fmt(cs.score)}
+                {!def.criteria.every((c) => c.noMax) && (
+                  <span className="faint" style={{ fontSize: 15, fontFamily: 'var(--f)' }}> / {fmt(max)}</span>
+                )}
+              </div>
               {!dq && empties > 0 && <div className="xs" style={{ color: 'var(--accent)', fontWeight: 700 }}>{empties} isian belum diisi (Disimpan draf)</div>}
             </div>
             {isLocked ? (

@@ -14,7 +14,7 @@ describe('bobot sesuai juklak', () => {
     expect(rawMax(def('lkbb'))).toBe(300);
     expect(rawMax(def('yel'))).toBe(100);
     expect(rawMax(def('pionering'))).toBe(100);
-    expect(rawMax(def('danton'))).toBe(100);
+    expect(def('danton').criteria[0].noMax).toBe(true);
     for (const k of ['menaksir', 'panorama', 'p3k', 'petapita']) expect(rawMax(def(k))).toBe(100);
     expect(rawMax(def('tari'))).toBe(150);
     expect(scoreMax(def('tari'))).toBe(200);
@@ -34,8 +34,8 @@ describe('perhitungan nilai', () => {
     expect(contestScore(def('yel'), rec(1, 'yel', d)).score).toBe(80);
     // Nilai dasar 5, kena penalti gaduh 3 kali (3 x 10 = 30) -> 5 - 30 = -25
     expect(contestScore(def('yel'), rec(1, 'yel', { c: { kreatif: [5], kompak: [0], aksesoris: [0] }, p: { gaduh: 3 } })).score).toBe(-25);
-    // Contoh kasus LKBB: nilai perolehan 70 (Juri 1=40, Juri 2=30), pelanggaran pengurangan 80 (8 x danton tidak menyebutkan aba-aba @ 10 poin) -> 70 - 80 = -10
-    expect(contestScore(def('lkbb'), rec(1, 'lkbb', { c: { juri1: [40], juri2: [30] }, p: { aba: 8 } })).score).toBe(-10);
+    // Contoh kasus LKBB: nilai perolehan 70 (Bobot Nilai=70), pelanggaran pengurangan 80 (8 x danton tidak menyebutkan aba-aba @ 10 poin) -> 70 - 80 = -10
+    expect(contestScore(def('lkbb'), rec(1, 'lkbb', { c: { bobot: [70] }, p: { aba: 8 } })).score).toBe(-10);
   });
   it('diskualifikasi bernilai 0', () => {
     expect(contestScore(def('yel'), rec(1, 'yel', { c: { kreatif: [60] } }, true)).score).toBe(0);
@@ -56,11 +56,11 @@ describe('perhitungan nilai', () => {
 });
 
 describe('peringkat per lomba', () => {
-  it('seri dipecah oleh kriteria juklak (LKBB: juri 1)', () => {
+  it('seri dipecah oleh kriteria juklak (LKBB: bobot)', () => {
     const t = [team(1), team(2)];
     const s = [
-      rec(1, 'lkbb', { c: { juri1: [100], juri2: [40] } }),
-      rec(2, 'lkbb', { c: { juri1: [110], juri2: [30] } }),
+      rec(1, 'lkbb', { c: { bobot: [140] } }),
+      rec(2, 'lkbb', { c: { bobot: [150] } }),
     ];
     const st = computeStandings(t, s, DEFAULT_CONFIG);
     expect(st.per.lkbb.map((r) => [r.teamId, r.rank, r.tie])).toEqual([['t2', 1, false], ['t1', 2, false]]);
@@ -90,7 +90,7 @@ describe('klasemen umum & kategori juara', () => {
     const s = [
       // Regu 1: Yel dapat 100, LKBB nilai dasar 70 kena penalti 80 = -10 -> total seharusnya 100 + (-10) = 90
       rec(1, 'yel', { c: { kreatif: [60], kompak: [30], aksesoris: [10] } }),
-      rec(1, 'lkbb', { c: { juri1: [40], juri2: [30] }, p: { aba: 8 } }),
+      rec(1, 'lkbb', { c: { bobot: [70] }, p: { aba: 8 } }),
       // Regu 2: Yel dapat 95
       rec(2, 'yel', { c: { kreatif: [55], kompak: [30], aksesoris: [10] } }),
     ];
@@ -106,9 +106,10 @@ describe('klasemen umum & kategori juara', () => {
   });
   it('lomba non rotasi (Danton, Tergiat) tidak masuk total', () => {
     const t = [team(1)];
-    const st = computeStandings(t, [rec(1, 'danton', { c: { ikit: [25], materi: [25], lapangan: [25], pasukan: [25] } })], DEFAULT_CONFIG);
+    // Danton bebas diisi berapapun (misal 350) dan tidak masuk total klasemen
+    const st = computeStandings(t, [rec(1, 'danton', { c: { bobot: [350] } })], DEFAULT_CONFIG);
     expect(st.rows[0].total).toBe(0);
-    expect(st.per.danton[0].score).toBe(100);
+    expect(st.per.danton[0].score).toBe(350);
   });
   it('total sama → seri, lalu urutan manual panitia', () => {
     const t = [team(1), team(2)];

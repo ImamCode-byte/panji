@@ -20,7 +20,10 @@ export function critValue(c: Criterion, d: ScoreData): number {
   const arr = d.c?.[c.id] ?? [];
   const n = reps(c);
   let s = 0;
-  for (let i = 0; i < n; i++) s += clamp(Number(arr[i]) || 0, 0, instMax(c));
+  for (let i = 0; i < n; i++) {
+    const v = Number(arr[i]) || 0;
+    s += c.noMax ? Math.max(0, v) : clamp(v, 0, instMax(c));
+  }
   return c.agg === 'avg' ? s / n : s;
 }
 export const rawMax = (def: ContestDef) => def.criteria.filter((c) => !c.noTotal).reduce((a, c) => a + c.max, 0);

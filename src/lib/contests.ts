@@ -72,21 +72,18 @@ export const DEFAULT_CONTESTS: ContestDef[] = [
   },
   {
     key: 'lkbb', name: 'LKBB Variasi', hari: hari(2), jam: '07.00–11.00', personil: '9 orang', inRecap: true,
-    criteria: [c('juri1', 'Juri 1', 150), c('juri2', 'Juri 2', 150)],
+    criteria: [c('bobot', 'Bobot Nilai 300%', 300)],
     penalties: [
       GADUH, { id: 'batas', label: 'Melewati batas yang ditentukan', points: 5 },
       { id: 'kavling', label: 'Melewati batas kavling', points: 5 }, OFFICIAL,
       { id: 'aba', label: 'Danton tidak menyebutkan aba-aba', points: 10, unit: 'aba-aba' },
     ],
-    tieBreak: ['juri1'], dqNotes: DQ_UMUM,
+    tieBreak: ['bobot'], dqNotes: DQ_UMUM,
   },
   {
     key: 'danton', name: 'Danton Terbaik', hari: hari(2), jam: '07.00–11.00', personil: 'Danton', inRecap: false,
-    criteria: [
-      c('ikit', 'IKIT (intonasi, ketegasan, irama, tekanan)', 25), c('materi', 'Penguasaan materi (aba-aba)', 25),
-      c('lapangan', 'Penguasaan lapangan', 25), c('pasukan', 'Penguasaan pasukan', 25),
-    ],
-    penalties: [], tieBreak: ['ikit'], dqNotes: DQ_UMUM,
+    criteria: [c('bobot', 'Bobot Nilai', 0, { noMax: true })],
+    penalties: [], tieBreak: ['bobot'], dqNotes: DQ_UMUM,
     note: 'Penilaian terpisah, tidak masuk klasemen umum.',
   },
   {

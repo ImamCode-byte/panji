@@ -8,6 +8,7 @@ export interface Criterion {
   repeat?: number; repeatLabels?: string[]; agg?: 'sum' | 'avg';
   int?: boolean;       // jawaban bulat (jumlah soal benar)
   noTotal?: boolean;   // tidak masuk total, hanya untuk penentu seri
+  noMax?: boolean;     // tanpa batas nilai maksimal (bebas diisi berapapun)
 }
 export interface Penalty { id: string; label: string; points: number; unit?: string }
 export interface TimeField { label: string; formula?: 'obstacle'; hint?: string }
