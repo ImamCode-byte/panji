@@ -15,7 +15,7 @@ describe('bobot sesuai juklak', () => {
     expect(rawMax(def('yel'))).toBe(100);
     expect(rawMax(def('pionering'))).toBe(100);
     expect(def('danton').criteria[0].noMax).toBe(true);
-    for (const k of ['menaksir', 'panorama', 'p3k', 'petapita']) expect(rawMax(def(k))).toBe(100);
+    for (const k of ['menaksir', 'panorama', 'p3k', 'petapita', 'semaphore']) expect(rawMax(def(k))).toBe(100);
     expect(rawMax(def('tari'))).toBe(150);
     expect(scoreMax(def('tari'))).toBe(200);
   });
@@ -45,9 +45,12 @@ describe('perhitungan nilai', () => {
     for (const x of def('tapak').criteria.filter((k) => k.id.startsWith('p_'))) c[x.id] = [x.max];
     expect(contestScore(def('tapak'), rec(1, 'tapak', { c })).score).toBe(200);
   });
-  it('Memanah: skala nilai 100', () => {
+  it('Memanah & Semaphore: skala nilai 100', () => {
     expect(contestScore(def('memanah'), rec(1, 'memanah', { c: { bobot: [100] } })).score).toBe(100);
     expect(contestScore(def('memanah'), rec(1, 'memanah', { c: { bobot: [50] } })).score).toBe(50);
+    expect(contestScore(def('semaphore'), rec(1, 'semaphore', { c: { bobot: [100] } })).score).toBe(100);
+    expect(contestScore(def('semaphore'), rec(1, 'semaphore', { c: { bobot: [85] } })).score).toBe(85);
+    expect(def('semaphore').time).toBeUndefined();
   });
   it('Regu Tergiat: rata-rata per hari', () => {
     const c = { disiplin: [90, 90, 90], aktif: [60, 60, 60], bersih: [30, 30, 30] };

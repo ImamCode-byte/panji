@@ -127,9 +127,8 @@ export const DEFAULT_CONTESTS: ContestDef[] = [
   },
   {
     key: 'semaphore', name: 'Semaphore', hari: hari(3), jam: '07.30–14.00', personil: '1 orang', inRecap: true,
-    criteria: [c('kebenaran', 'Kebenaran', 100)],
-    time: { label: 'Kecepatan', hint: 'Penentu seri setelah kebenaran' },
-    penalties: [GADUH, OFFICIAL], tieBreak: ['kebenaran', 'time'], dqNotes: DQ_UMUM,
+    criteria: [c('bobot', 'Bobot Nilai', 100, { group: 'Semaphore', maxLabel: 'Skema' })],
+    penalties: [GADUH, OFFICIAL], tieBreak: ['bobot'], dqNotes: DQ_UMUM,
   },
   {
     key: 'menaksir', name: 'Menaksir', hari: hari(3), jam: '07.30–14.00', personil: '2 orang', inRecap: true,
