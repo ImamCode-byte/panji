@@ -158,7 +158,7 @@ export const DEFAULT_CONTESTS: ContestDef[] = [
     dqNotes: [...DQ_UMUM, 'Pembina / official ikut mengerjakan', 'Tidak menulis dengan bolpoin'],
   },
   {
-    key: 'tergiat', name: 'Regu Tergiat', hari: 'Sabtu–Senin', jam: 'Non rotasi', personil: 'Regu', inRecap: false, normalizeTo: 100,
+    key: 'tergiat', name: 'Regu Tergiat', hari: 'Sabtu–Senin', jam: 'Non rotasi', personil: 'Regu', inRecap: false,
     criteria: [
       c('pioneering', 'Pioneering', 100, { group: 'Regu Tergiat' }),
       c('msc', 'MSC', 100, { group: 'Regu Tergiat' }),
@@ -167,7 +167,7 @@ export const DEFAULT_CONTESTS: ContestDef[] = [
       c('semaphore', 'Semaphore', 100, { group: 'Regu Tergiat' }),
     ],
     penalties: [], tieBreak: ['pioneering'], dqNotes: DQ_UMUM,
-    note: 'Nilai non rotasi. Masing-masing aspek dinilai 0–100, lalu dirata-rata ke skala 100.',
+    note: 'Nilai non rotasi. Total akumulasi 5 aspek (maksimal 500).',
   },
 ];
 

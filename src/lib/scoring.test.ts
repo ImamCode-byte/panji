@@ -18,6 +18,8 @@ describe('bobot sesuai juklak', () => {
     for (const k of ['menaksir', 'panorama', 'p3k', 'petapita', 'semaphore']) expect(rawMax(def(k))).toBe(100);
     expect(rawMax(def('tari'))).toBe(150);
     expect(scoreMax(def('tari'))).toBe(200);
+    expect(rawMax(def('tergiat'))).toBe(500);
+    expect(scoreMax(def('tergiat'))).toBe(500);
   });
 });
 
@@ -52,9 +54,9 @@ describe('perhitungan nilai', () => {
     expect(contestScore(def('semaphore'), rec(1, 'semaphore', { c: { bobot: [85] } })).score).toBe(85);
     expect(def('semaphore').time).toBeUndefined();
   });
-  it('Regu Tergiat: rata-rata dari 5 aspek', () => {
+  it('Regu Tergiat: akumulasi total dari 5 aspek (maks 500)', () => {
     const c = { pioneering: [100], msc: [80], sandi: [60], memanah: [70], semaphore: [90] };
-    expect(contestScore(def('tergiat'), rec(1, 'tergiat', { c })).score).toBe(80);
+    expect(contestScore(def('tergiat'), rec(1, 'tergiat', { c })).score).toBe(400);
   });
 });
 
