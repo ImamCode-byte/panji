@@ -78,7 +78,7 @@ export default function Public() {
               ))}</div>}
               <div className="search"><Icon n="search" size={18} /><input className="input" placeholder="Cari regu atau pangkalan" value={q} onChange={(e) => setQ(e.target.value)} /></div>
               <RankTable lines={rows} recap={s.recap} provisional={!s.complete} />
-              {!s.complete && <p className="xs faint">* Kategori sementara, belum semua lomba dinilai.</p>}
+              {!s.complete && <p className="xs faint">Kategori sementara, belum semua lomba dinilai.</p>}
             </>}
             {tab === 'j' && (groups.length ? <div className="grid g2">{groups.map(([g, items]) => (
               <div key={g} className="card"><div className="sec-t" style={{ borderRadius: '14px 14px 0 0' }}>{g}</div>

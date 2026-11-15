@@ -39,7 +39,7 @@ export default function Standings() {
         {tab === 'u' && <>
           <div className="search"><Icon n="search" size={18} /><input className="input" placeholder="Cari regu atau pangkalan" value={q} onChange={(e) => setQ(e.target.value)} /></div>
           <RankTable lines={lines} recap={st.recap} provisional={!st.complete} />
-          <p className="xs faint">Seri nilai total dipecah: jumlah juara 1, 2, 3 di tiap lomba, lalu urutan manual panitia (menu Regu). {!st.complete && '* Kategori sementara.'}</p>
+          <p className="xs faint">Seri nilai total dipecah: jumlah juara 1, 2, 3 di tiap lomba, lalu urutan manual panitia (menu Regu). {!st.complete && 'Kategori sementara (belum semua lomba dinilai).'}</p>
         </>}
         {tab === 'l' && <>
           <Seg value={lk} onChange={setLk} opts={contests} />

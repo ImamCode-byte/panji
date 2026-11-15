@@ -14,7 +14,7 @@ type Rc = { key: string; name: string; max: number };
 export function RankTable({ lines, recap, provisional }: { lines: Line[]; recap: Rc[]; provisional?: boolean }) {
   const [open, setOpen] = useState<number | null>(null);
   if (!lines.length) return <div className="empty">Tidak ada data.</div>;
-  const award = (l: Line) => l.out ? <span className="chip bad">Diskualifikasi</span> : l.award ? <span className={`chip ${l.rank <= 4 ? 'gold' : ''}`}>{l.award}{provisional ? '*' : ''}</span> : null;
+  const award = (l: Line) => l.out ? <span className="chip bad">Diskualifikasi</span> : l.award ? <span className={`chip ${l.rank <= 4 ? 'gold' : ''}`}>{l.award}</span> : null;
   return (
     <>
       <div className="tw show-d">
