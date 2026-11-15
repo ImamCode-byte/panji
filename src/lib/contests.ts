@@ -136,7 +136,7 @@ export const DEFAULT_CONTESTS: ContestDef[] = [
     penalties: [GADUH, WAKTU, OFFICIAL], tieBreak: ['tepat'], dqNotes: DQ_UMUM,
   },
   {
-    key: 'panorama', name: 'Panorama Sketsa', hari: hari(3), jam: '07.30–14.00', personil: '1 orang', inRecap: true,
+    key: 'panorama', name: 'Panorama Sket', hari: hari(3), jam: '07.30–14.00', personil: '1 orang', inRecap: true,
     criteria: [c('benar', 'Kebenaran', 60), c('rapi', 'Kerapian', 40)],
     penalties: [GADUH, OFFICIAL], tieBreak: ['benar'], dqNotes: DQ_UMUM,
   },
