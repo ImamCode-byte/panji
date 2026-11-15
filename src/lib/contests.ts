@@ -256,6 +256,6 @@ export function mergeConfig(saved: Partial<Config> | null | undefined): Config {
 
 export const ABBR: Record<string, string> = {
   administrasi: 'Adm', tapak: 'Tapak', yel: 'Yel', tari: 'Tari', lkbb: 'LKBB', pionering: 'Pioner', sandi: 'Sandi', memanah: 'Panah',
-  msc: 'MSC', semaphore: 'Semaph', menaksir: 'Taksir', panorama: 'Panorama', p3k: 'P3K', halang: 'Halrin', petapita: 'Peta Pita',
+  msc: 'MSC', semaphore: 'Semaph', menaksir: 'Menaksir', panorama: 'Panorama', p3k: 'P3K', halang: 'Halrin', petapita: 'Peta Pita',
   danton: 'Danton', tergiat: 'Tergiat',
 };
