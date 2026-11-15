@@ -232,4 +232,13 @@ describe('konfigurasi', () => {
     expect(m.contests.find((d) => d.key === 'yel')!.criteria[0].max).toBe(55);
     expect(m.contests).toHaveLength(DEFAULT_CONTESTS.length);
   });
+  it('mergeConfig tidak mempertahankan normalizeTo usang jika bawaan tidak dinormalkan (Regu Tergiat total 500)', () => {
+    const saved = structuredClone(DEFAULT_CONFIG);
+    const tergiatSaved = saved.contests.find((d) => d.key === 'tergiat')!;
+    (tergiatSaved as any).normalizeTo = 100; // simulasi data usang yang pernah tersimpan di settings DB
+    const m = mergeConfig(saved);
+    const tergiatMerged = m.contests.find((d) => d.key === 'tergiat')!;
+    expect(tergiatMerged.normalizeTo).toBeUndefined();
+    expect(scoreMax(tergiatMerged)).toBe(500);
+  });
 });

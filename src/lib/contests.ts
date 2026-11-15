@@ -218,7 +218,7 @@ export function mergeConfig(saved: Partial<Config> | null | undefined): Config {
     const cm = new Map(s.criteria.map((x) => [x.id, x.max]));
     const pm = new Map(s.penalties.map((x) => [x.id, x.points]));
     return {
-      ...structuredClone(d), inRecap: s.inRecap, normalizeTo: s.normalizeTo ?? d.normalizeTo,
+      ...structuredClone(d), inRecap: s.inRecap, normalizeTo: d.normalizeTo == null ? undefined : (s.normalizeTo ?? d.normalizeTo),
       criteria: d.criteria.map((x) => ({ ...x, max: cm.get(x.id) ?? x.max })),
       penalties: d.penalties.map((x) => ({ ...x, points: pm.get(x.id) ?? x.points })),
     };
