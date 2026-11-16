@@ -16,14 +16,19 @@ export default function Standings() {
   ].filter((x, i, a) => a.findIndex((y) => y.v === x.v) === i);
   const ranked = st.per[lk] ?? [];
 
-  const csv = () => {
-    const sep = ';', n = (v: number | null) => (v == null ? '' : String(v).replace('.', ','));
-    const esc = (s: string) => `"${s.replace(/"/g, '""')}"`;
-    const out = [['Rank', 'No. Kav.', 'Regu', 'Pangkalan', ...st.recap.map((r) => r.name), 'Total', 'Kategori'].map(esc).join(sep)];
-    st.rows.forEach((r) => out.push([r.rank || '', r.team.no, esc(r.team.name), esc(r.team.pangkalan), ...st.recap.map((x) => n(r.scores[x.key])), n(r.total), esc(r.team.dq ? 'Diskualifikasi' : r.award ?? '')].join(sep)));
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob(['\ufeff' + out.join('\n')], { type: 'text/csv;charset=utf-8' }));
-    a.download = `klasemen-${cfg.event.short.replace(/\s+/g, '-').toLowerCase()}.csv`; a.click(); URL.revokeObjectURL(a.href);
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadExcel = async () => {
+    setDownloading(true);
+    try {
+      const { exportStandingsToExcel } = await import('../lib/exportExcel');
+      await exportStandingsToExcel(st, cfg);
+      toast('Rekapitulasi Excel (.xlsx) berhasil diunduh');
+    } catch (e) {
+      toast((e as Error).message, 'err');
+    } finally {
+      setDownloading(false);
+    }
   };
   const pub = async () => { setBusy(true); try { await publish(); toast('Klasemen diterbitkan'); } catch (e) { toast((e as Error).message, 'err'); } finally { setBusy(false); } };
 
@@ -31,7 +36,7 @@ export default function Standings() {
     <div className="page">
       <div className="page-h">
         <div><div className="eyebrow">{st.complete ? 'Final' : 'Sementara'} · {st.of} lomba</div><h1>Klasemen</h1></div>
-        <div className="row"><button className="btn sm" onClick={csv}><Icon n="down" size={17} />CSV</button>
+        <div className="row"><button className="btn sm" disabled={downloading} onClick={downloadExcel}><Icon n="down" size={17} />{downloading ? 'Mengunduh…' : 'Excel (.xlsx)'}</button>
           {me?.role === 'admin' && <button className="btn accent sm" disabled={busy} onClick={pub}><Icon n="globe" size={17} />{busy ? 'Menerbitkan…' : 'Terbitkan'}</button>}</div>
       </div>
       <div className="stack lg">
