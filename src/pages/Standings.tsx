@@ -63,7 +63,7 @@ export default function Standings() {
         {tab === 'k' && <div className="grid g2" style={{ alignItems: 'start' }}>
           {[['danton', 'Danton Terbaik'], ['tergiat', 'Regu Tergiat']].map(([k, n]) => (
             <div key={k} className="card"><div className="sec-t" style={{ borderRadius: '14px 14px 0 0' }}>{n}</div>
-              {(st.per[k] ?? []).slice(0, 10).map((r) => { const t = tm.get(r.teamId)!; return <div key={r.teamId} className="li" style={{ cursor: 'default' }}><Rank n={r.rank} tie={r.tie} /><div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{t.name}</div><div className="xs muted trunc">{t.pangkalan}</div></div><b className="num">{fmt(r.score)}</b></div>; })}
+              {(st.per[k] ?? []).slice(0, 3).map((r) => { const t = tm.get(r.teamId)!; return <div key={r.teamId} className="li" style={{ cursor: 'default' }}><Rank n={r.rank} tie={r.tie} /><div className="grow"><div className="trunc" style={{ fontWeight: 700 }}>{t.name}</div><div className="xs muted trunc">{t.pangkalan}</div></div><b className="num">{fmt(r.score)}</b></div>; })}
               {!(st.per[k] ?? []).length && <Empty>Belum ada nilai.</Empty>}
             </div>))}
         </div>}
