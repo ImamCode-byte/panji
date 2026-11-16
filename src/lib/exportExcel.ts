@@ -420,7 +420,7 @@ export async function exportStandingsToExcel(st: Standings, cfg: Config) {
   // 1. Tulis tabel lomba-lomba di sebelah kiri (Kolom C..V)
   // Grid: 4 kolom blok lomba per baris: C(3), H(8), N(14), S(19)
   const leftColStarts = [3, 8, 14, 19];
-  const allContests = cfg.contests;
+  const allContests = cfg.contests.filter((c) => c.key !== 'msc_penyisihan' && c.key !== 'msc_semifinal');
   const teamMap = new Map(st.rows.map((r) => [r.team.id, r.team]));
 
   allContests.forEach((cDef, index) => {
