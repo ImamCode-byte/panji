@@ -254,7 +254,7 @@ export default function Settings() {
             <div className="stack sm">
               <PosControl
                 label="Nama Regu"
-                sample="Regu Garuda"
+                sample="Garuda"
                 x={d.certificate?.nameX ?? d.certificate?.textOffsetX ?? 0}
                 y={d.certificate?.nameY ?? d.certificate?.textOffsetY ?? 0}
                 onChangeX={(n) => {
@@ -265,23 +265,6 @@ export default function Settings() {
                 onChangeY={(n) => {
                   const c = structuredClone(d.certificate ?? {});
                   c.nameY = n;
-                  setD({ ...d, certificate: c });
-                }}
-              />
-
-              <PosControl
-                label="Pangkalan / Sekolah"
-                sample="Darul Ulum Banyuanyar"
-                x={d.certificate?.pangkalanX ?? d.certificate?.textOffsetX ?? 0}
-                y={d.certificate?.pangkalanY ?? d.certificate?.textOffsetY ?? 0}
-                onChangeX={(n) => {
-                  const c = structuredClone(d.certificate ?? {});
-                  c.pangkalanX = n;
-                  setD({ ...d, certificate: c });
-                }}
-                onChangeY={(n) => {
-                  const c = structuredClone(d.certificate ?? {});
-                  c.pangkalanY = n;
                   setD({ ...d, certificate: c });
                 }}
               />
@@ -307,7 +290,7 @@ export default function Settings() {
               <div style={{ padding: '10px 12px', background: 'rgba(0,0,0,.02)', borderRadius: 10, border: '1px solid var(--line)' }}>
                 <div className="row between" style={{ marginBottom: 6 }}>
                   <b style={{ fontSize: 13.5 }}>Ukuran Font (px)</b>
-                  {(d.certificate?.nameSize !== 54 || d.certificate?.pangkalanSize !== 27 || d.certificate?.awardSize !== 40) && (
+                  {(d.certificate?.nameSize !== 54 || d.certificate?.awardSize !== 40) && (
                     <button
                       type="button"
                       className="btn ghost sm"
@@ -315,7 +298,6 @@ export default function Settings() {
                       onClick={() => {
                         const c = structuredClone(d.certificate ?? {});
                         c.nameSize = 54;
-                        c.pangkalanSize = 27;
                         c.awardSize = 40;
                         setD({ ...d, certificate: c });
                       }}
@@ -324,9 +306,9 @@ export default function Settings() {
                     </button>
                   )}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                   <div>
-                    <div className="xs muted trunc" style={{ marginBottom: 4 }} title="Regu Garuda">Regu Garuda</div>
+                    <div className="xs muted trunc" style={{ marginBottom: 4 }} title="Garuda">Garuda (Nama Regu)</div>
                     <div className="row" style={{ gap: 4, alignItems: 'center' }}>
                       <input
                         type="number"
@@ -346,27 +328,7 @@ export default function Settings() {
                     </div>
                   </div>
                   <div>
-                    <div className="xs muted trunc" style={{ marginBottom: 4 }} title="Darul Ulum Banyuanyar">Darul Ulum…</div>
-                    <div className="row" style={{ gap: 4, alignItems: 'center' }}>
-                      <input
-                        type="number"
-                        min="10"
-                        max="80"
-                        className="input sm"
-                        style={{ width: '100%', padding: '4px 6px', height: 30, fontSize: 13, textAlign: 'center' }}
-                        value={d.certificate?.pangkalanSize ?? 27}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value, 10);
-                          const c = structuredClone(d.certificate ?? {});
-                          c.pangkalanSize = Number.isFinite(val) && val > 0 ? val : 27;
-                          setD({ ...d, certificate: c });
-                        }}
-                      />
-                      <span className="xs muted">px</span>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="xs muted trunc" style={{ marginBottom: 4 }} title="Juara Umum">Juara Umum</div>
+                    <div className="xs muted trunc" style={{ marginBottom: 4 }} title="Juara Umum">Juara Umum (Predikat)</div>
                     <div className="row" style={{ gap: 4, alignItems: 'center' }}>
                       <input
                         type="number"
@@ -398,7 +360,7 @@ export default function Settings() {
             </div>
             <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--line)' }}>
               <Cert
-                c={{ kind: 'Sertifikat Kejuaraan', label: 'Juara Umum', name: 'Regu Garuda', pangkalan: 'Darul Ulum Banyuanyar', teamId: 'sample-preview' }}
+                c={{ kind: 'Sertifikat Kejuaraan', label: 'Juara Umum', name: 'Garuda', pangkalan: '', teamId: 'sample-preview' }}
                 ev={d.event}
                 certCfg={d.certificate}
               />
